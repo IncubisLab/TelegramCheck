@@ -55,48 +55,31 @@ namespace Telegram.Bot.Examples.Echo
             sr.Close();
             return Out;
         }
-        private static async void Checking(string scanData, Message message)
+        private static async void ParserQR_Code(string input, Message message)
         {
-            if (scanData != null)
+            string fn = RegularExpressions(input, "fn=(\\d+)");
+            string fd = RegularExpressions(input, "i=(\\d+)");
+            string fp = RegularExpressions(input, "fp=(\\d+)");
+
+            Checking checking = new Checking("+79817889931", "405381");
+
+            CheckInfo checkInfo = new CheckInfo
             {
-                string input = scanData;
-                string fnPattern = "fn=(\\d+)";
-                string iPattern = "i=(\\d+)";
-                string fpPattern = "fp=(\\d+)";
+                FN = fn,
+                FD = fd,
+                FS = fp
+            };
 
+            var check = checking.GetCheck(checkInfo);
 
-                    string fn = RegularExpressions(input, fnPattern);
-                    string i = RegularExpressions(input, iPattern);
-                    string fp = RegularExpressions(input, fpPattern);
-
-
-                    try
-                    {
-                        Checking checking = new Checking("+79817889931", "405381");
-
-                        CheckInfo checkInfo = new CheckInfo
-                        {
-                            FN = fn,
-                            FD = i,
-                            FS = fp
-                        };
-
-                        var check = checking.GetCheck(checkInfo);
-
-                        StringBuilder str = new StringBuilder("");
-                        foreach (var item in check.Document.Receipt.Items)
-                        {
-                            // str.AppendLine($"{item.Name} - {item.Sum}");
-                            str.Append(string.Format("\n{0} - {1}", item.Name, item.Sum));
-                        }
-
-                        await Bot.SendTextMessageAsync(
-                             message.Chat.Id,
-                             str.ToString());
-                    }
-                    catch { }
-
+            StringBuilder str = new StringBuilder("");
+            foreach (var item in check.Document.Receipt.Items)
+            {
+                // str.AppendLine($"{item.Name} - {item.Sum}");
+                str.Append(string.Format("\n{0} - {1}", item.Name, item.Sum));
             }
+
+            await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
         }
         private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
@@ -110,15 +93,12 @@ namespace Telegram.Bot.Examples.Echo
 
                 int num = message.Photo.Count() - 1;
 
-
-
                 image.Save(test.FilePath);
 
                 string get =
                     String.Format(
                         "https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",
                         message.Photo[num].FilePath);
-            //    Thread.Sleep(500);
                 // message.Photo.Count()-1 => the biggest resolution
                 string data = GET(get,"");
 
@@ -129,46 +109,12 @@ namespace Telegram.Bot.Examples.Echo
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
                 if (scanData.Symbol.Error == null)
                 {
-                    string input = scanData.Symbol.Data;
-                    string fnPattern = "fn=(\\d+)";
-                    string iPattern = "i=(\\d+)";
-                    string fpPattern = "fp=(\\d+)";
-
-
-                    string fn = RegularExpressions(input, fnPattern);
-                    string i = RegularExpressions(input, iPattern);
-                    string fp = RegularExpressions(input, fpPattern);
-
-                    Checking checking = new Checking("+79817889931", "405381");
-
-                    CheckInfo checkInfo = new CheckInfo
-                    {
-                        FN = fn,
-                        FD = i,
-                        FS = fp
-                    };
-
-                    var check = checking.GetCheck(checkInfo);
-
-                    StringBuilder str = new StringBuilder("");
-                    foreach (var item in check.Document.Receipt.Items)
-                    {
-                        // str.AppendLine($"{item.Name} - {item.Sum}");
-                        str.Append(string.Format("\n{0} - {1}", item.Name, item.Sum));
-                    }
-
-
-                    await Bot.SendTextMessageAsync(
-                        message.Chat.Id,
-                        str.ToString());
-
+                    ParserQR_Code(scanData.Symbol.Data, message);
                 }
-
-
             }
             if (message.Type == MessageType.TextMessage)
             {
-                Checking(message.Text, message);
+                ParserQR_Code(message.Text, message);
             }
 
             //if (message == null || message.Type != MessageType.TextMessage) return;
