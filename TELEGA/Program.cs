@@ -64,27 +64,10 @@ namespace Telegram.Bot.Examples.Echo
                 string iPattern = "i=(\\d+)";
                 string fpPattern = "fp=(\\d+)";
 
-              
-                    Regex regex = new Regex(fnPattern);
 
-                    // Получаем совпадения в экземпляре класса Match
-                    Match match = regex.Match(input);
-
-                    string fn = match.Groups[1].Value;
-
-                    Regex regex1 = new Regex(iPattern);
-
-                    // Получаем совпадения в экземпляре класса Match
-                    Match match1 = regex1.Match(input);
-
-                    string i = match1.Groups[1].Value;
-
-                    Regex regex2 = new Regex(fpPattern);
-
-                    // Получаем совпадения в экземпляре класса Match
-                    Match match2 = regex2.Match(input);
-
-                    string fp = match2.Groups[1].Value;
+                    string fn = RegularExpressions(input, fnPattern);
+                    string i = RegularExpressions(input, iPattern);
+                    string fp = RegularExpressions(input, fpPattern);
 
 
                     try
@@ -152,26 +135,9 @@ namespace Telegram.Bot.Examples.Echo
                     string fpPattern = "fp=(\\d+)";
 
 
-                    Regex regex = new Regex(fnPattern);
-
-                    // Получаем совпадения в экземпляре класса Match
-                    Match match = regex.Match(input);
-
-                    string fn = match.Groups[1].Value;
-
-                    Regex regex1 = new Regex(iPattern);
-
-                    // Получаем совпадения в экземпляре класса Match
-                    Match match1 = regex1.Match(input);
-
-                    string i = match1.Groups[1].Value;
-
-                    Regex regex2 = new Regex(fpPattern);
-
-                    // Получаем совпадения в экземпляре класса Match
-                    Match match2 = regex2.Match(input);
-
-                    string fp = match2.Groups[1].Value;
+                    string fn = RegularExpressions(input, fnPattern);
+                    string i = RegularExpressions(input, iPattern);
+                    string fp = RegularExpressions(input, fpPattern);
 
                     Checking checking = new Checking("+79817889931", "405381");
 
@@ -313,6 +279,12 @@ namespace Telegram.Bot.Examples.Echo
 //                        replyMarkup: new ReplyKeyboardRemove());
 //                    break;
 //            }
+        }
+        private static string RegularExpressions(string input, string pattern)
+        {
+            Regex regex = new Regex(pattern);
+            Match match = regex.Match(input);
+            return match.Groups[1].Value;
         }
 
         private static async void BotOnCallbackQueryReceived(object sender, CallbackQueryEventArgs callbackQueryEventArgs)
