@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TELEGA", "TELEGA\TELEGA.csproj", "{FE3A0ECB-52ED-4E63-AFA6-16A6BAAE931F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F14D74E8-74E8-4A93-B853-6E978C6D97E0}"
+	ProjectSection(SolutionItems) = preProject
+		TELEGA\bin\Debug\Newtonsoft.Json.dll = TELEGA\bin\Debug\Newtonsoft.Json.dll
+		TELEGA\bin\Debug\Newtonsoft.Json.xml = TELEGA\bin\Debug\Newtonsoft.Json.xml
+		TELEGA\bin\Debug\Telegram.Bot.dll = TELEGA\bin\Debug\Telegram.Bot.dll
+		TELEGA\bin\Debug\Telegram.Bot.xml = TELEGA\bin\Debug\Telegram.Bot.xml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSNCheck", "FSNCheck\FSNCheck.csproj", "{F7416362-C4E5-45B0-9593-8CCF4B19E3E2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE3A0ECB-52ED-4E63-AFA6-16A6BAAE931F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE3A0ECB-52ED-4E63-AFA6-16A6BAAE931F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE3A0ECB-52ED-4E63-AFA6-16A6BAAE931F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE3A0ECB-52ED-4E63-AFA6-16A6BAAE931F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7416362-C4E5-45B0-9593-8CCF4B19E3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7416362-C4E5-45B0-9593-8CCF4B19E3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7416362-C4E5-45B0-9593-8CCF4B19E3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7416362-C4E5-45B0-9593-8CCF4B19E3E2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE7C110B-A5E7-4506-AC55-8699DAF85D66}
+	EndGlobalSection
+EndGlobal
