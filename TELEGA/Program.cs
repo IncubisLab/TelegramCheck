@@ -105,15 +105,19 @@ namespace Telegram.Bot.Examples.Echo
                 }
             }
         }
-        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        private static void BotOnTextMessage(Message message)
         {
-            var message = messageEventArgs.Message;
-            BotOnPhotoMassage(message);
-           
             if (message.Type == MessageType.TextMessage)
             {
                 ParserQR_Code(message.Text, message);
             }
+        }
+        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        {
+            var message = messageEventArgs.Message;
+            BotOnPhotoMassage(message);
+            BotOnTextMessage(message);
+           
 
             //if (message == null || message.Type != MessageType.TextMessage) return;
 
