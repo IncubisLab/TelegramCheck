@@ -81,18 +81,13 @@ namespace Telegram.Bot.Examples.Echo
 
             await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
         }
-        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        private static async void BotOnPhotoMassage(Message message)
         {
-            var message = messageEventArgs.Message;
-
             if (message.Type == MessageType.PhotoMessage)
             {
                 var test = await Bot.GetFileAsync(message.Photo[message.Photo.Count() - 1].FileId);
-
                 var image = Bitmap.FromStream(test.FileStream);
-
                 int num = message.Photo.Count() - 1;
-
                 image.Save(test.FilePath);
 
                 string get =
@@ -100,18 +95,21 @@ namespace Telegram.Bot.Examples.Echo
                         "https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",
                         message.Photo[num].FilePath);
                 // message.Photo.Count()-1 => the biggest resolution
-                string data = GET(get,"");
+                string data = GET(get, "");
 
-                await Bot.SendTextMessageAsync(
-                    message.Chat.Id,
-                    data);
-
+                await Bot.SendTextMessageAsync(message.Chat.Id, data);
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
                 if (scanData.Symbol.Error == null)
                 {
                     ParserQR_Code(scanData.Symbol.Data, message);
                 }
             }
+        }
+        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        {
+            var message = messageEventArgs.Message;
+            BotOnPhotoMassage(message);
+           
             if (message.Type == MessageType.TextMessage)
             {
                 ParserQR_Code(message.Text, message);
