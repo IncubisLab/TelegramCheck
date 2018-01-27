@@ -41,7 +41,7 @@ namespace Telegram.Bot.Examples.Echo
             Bot.StartReceiving();
           //  Console.WriteLine($"Start listening for @{me.Username}");
             Console.WriteLine(string.Format("Start listening for {0}",me.Username));
-            Console.ReadLine();
+            Console.ReadKey();
             Bot.StopReceiving();
         }
 
@@ -73,13 +73,17 @@ namespace Telegram.Bot.Examples.Echo
             var check = checking.GetCheck(checkInfo);
 
             StringBuilder str = new StringBuilder("");
-            foreach (var item in check.Document.Receipt.Items)
+            try
             {
-                // str.AppendLine($"{item.Name} - {item.Sum}");
-                str.Append(string.Format("\n{0} - {1}", item.Name, item.Sum));
-            }
+                foreach (var item in check.Document.Receipt.Items)
+                {
+                    // str.AppendLine($"{item.Name} - {item.Sum}");
+                    double sum = Convert.ToDouble(item.Sum) / 100;
+                    str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
+                }
 
-            await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
+                await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
+            } catch (System.NullReferenceException e) { throw; }
         }
         private static async void BotOnPhotoMassage(Message message)
         {
@@ -112,7 +116,7 @@ namespace Telegram.Bot.Examples.Echo
                 ParserQR_Code(message.Text, message);
             }
         }
-        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
             BotOnPhotoMassage(message);
