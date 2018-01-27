@@ -83,7 +83,12 @@ namespace Telegram.Bot.Examples.Echo
                 }
 
                 await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
-            } catch (System.NullReferenceException e) { throw; }
+            }
+            catch 
+            { Console.WriteLine("Ошибка объекта");
+              ParserQR_Code( input,  message);
+            }
+            
         }
         private static async void BotOnPhotoMassage(Message message)
         {
@@ -92,12 +97,13 @@ namespace Telegram.Bot.Examples.Echo
                 var test = await Bot.GetFileAsync(message.Photo[message.Photo.Count() - 1].FileId);
                 var image = Bitmap.FromStream(test.FileStream);
                 int num = message.Photo.Count() - 1;
+                string file_name = test.FilePath;
                 image.Save(test.FilePath);
 
                 string get =
                     String.Format(
                         "https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",
-                        message.Photo[num].FilePath);
+                        file_name);
                 // message.Photo.Count()-1 => the biggest resolution
                 string data = GET(get, "");
 
