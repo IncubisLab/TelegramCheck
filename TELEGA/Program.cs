@@ -37,9 +37,39 @@ namespace Telegram.Bot.Examples.Echo
             Bot.StartReceiving();
             Console.WriteLine(string.Format("Start listening for {0}",me.Username));
             Console.ReadKey();
-            Bot.StopReceiving();
+            Select_Query();
+           
         }
+        private static void Select_Query()
+        {
+            Console.WriteLine("Введите команду/");
+            string text = Console.ReadLine();
+            if (text == "Select")
+            {
+                Console.WriteLine("Введите номер чека");
+                string num = Console.ReadLine();
+                try
+                {
+                    my_sql_control.MySQL_SelectExampel("Select * From users, products Where products.id_check = '" + num + "'");
+                }catch { }   
+            }
+           if (text == "Delete")
+           {
+               Console.WriteLine("Введите номер чека");
+               string num = Console.ReadLine();
+               try
+               {
+                   my_sql_control.MySQL_SelectExampel("DELETE FROM ibmx_2f92d9c8849688d.products WHERE id_check='" + num + "'");
+                   my_sql_control.MySQL_SelectExampel("DELETE FROM ibmx_2f92d9c8849688d.check WHERE chek_number='" + num + "'");
+                   
+               }
+               catch { }   
+           }
 
+            else if (text == "Exit") { Bot.StopReceiving(); Environment.Exit(0); }
+            Select_Query();
+            
+        }
         private static string GET(string Url, string Data)
         {
             System.Net.WebRequest req = System.Net.WebRequest.Create(Url + "?" + Data);
@@ -82,23 +112,48 @@ namespace Telegram.Bot.Examples.Echo
             { Console.WriteLine("Ошибка объекта");
               ParserQR_Code( input,  message);
             }
+            Console.WriteLine("Чек номер {0}", check.Document.Receipt.ShiftNumber);
             try
             {
                 my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + message.Chat.Id + "');");
             }
             catch { }
-            
-                foreach (var item in check.Document.Receipt.Items)
+           // InsertCheck(check.Document.Receipt.ShiftNumber, message.Chat.Id);
+           // InsertProduct(check);
+            foreach (var item in check.Document.Receipt.Items)
+            {
+                double sum = Convert.ToDouble(item.Sum) / 100;
+                try
                 {
-                    double sum = Convert.ToDouble(item.Sum) / 100;
-                    try
-                    {
-                        my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
-                    }
-                    catch { }
+                    my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
                 }
+                catch 
+                {
+                    
+                }
+            }
            
            
+        }
+        private static void InsertCheck(int chek_number, ValueType user_id)
+        {
+            try
+            {
+                my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + chek_number + "', '" + user_id + "');");
+            }
+            catch { }
+        }
+        private static void InsertProduct(Check check)
+        {
+            foreach (var item in check.Document.Receipt.Items)
+            {
+                double sum = Convert.ToDouble(item.Sum) / 100;
+                try
+                {
+                    my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
+                }
+                catch { }
+            }
         }
         private static async void BotOnPhotoMassage(Message message)
         {
@@ -115,7 +170,7 @@ namespace Telegram.Bot.Examples.Echo
                         "https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",
                         file_name);
                 string data = GET(get, "");
-                Console.WriteLine("Имя пользователя: {0}",message.Chat.FirstName);
+                Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
                 try
                 {
                     my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.users (idUsers, LastName, FirstName) VALUES ('" + message.Chat.Id + "', '" + message.Chat.LastName + "', '" + message.Chat.FirstName + "');");
@@ -127,12 +182,19 @@ namespace Telegram.Bot.Examples.Echo
                 {
                     ParserQR_Code(scanData.Symbol.Data, message);
                 }
+               
             }
         }
         private static void BotOnTextMessage(Message message)
         {
             if (message.Type == MessageType.TextMessage)
             {
+                Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
+                try
+                {
+                    my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.users (idUsers, LastName, FirstName) VALUES ('" + message.Chat.Id + "', '" + message.Chat.LastName + "', '" + message.Chat.FirstName + "');");
+                }
+                catch { };
                 ParserQR_Code(message.Text, message);
             }
         }
@@ -141,8 +203,6 @@ namespace Telegram.Bot.Examples.Echo
             var message = messageEventArgs.Message;
             BotOnPhotoMassage(message);
             BotOnTextMessage(message);
-           
-         
         }
         private static string RegularExpressions(string input, string pattern)
         {
