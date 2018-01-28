@@ -18,11 +18,13 @@ using FSNCheck.Data;
 using Newtonsoft.Json;
 using TELEGA;
 
+
 namespace Telegram.Bot.Examples.Echo
 {
     public static class Program
     {
         private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
+        private static MySQLControl my_sql_control = new MySQLControl();
 
         public static void Main(string[] args)
         {
@@ -73,14 +75,14 @@ namespace Telegram.Bot.Examples.Echo
                     double sum = Convert.ToDouble(item.Sum) / 100;
                     str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
                 }
-
+             
                 await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
             }
             catch 
             { Console.WriteLine("Ошибка объекта");
               ParserQR_Code( input,  message);
             }
-            
+            my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + message.Chat.Id + "');");
         }
         private static async void BotOnPhotoMassage(Message message)
         {
@@ -97,7 +99,12 @@ namespace Telegram.Bot.Examples.Echo
                         "https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",
                         file_name);
                 string data = GET(get, "");
-
+                Console.WriteLine("Имя пользователя: {0}",message.Chat.FirstName);
+                try
+                {
+                    my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.users (idUsers, LastName, FirstName) VALUES ('" + message.Chat.Id + "', '" + message.Chat.LastName + "', '" + message.Chat.FirstName + "');");
+                }
+                catch { };
                 await Bot.SendTextMessageAsync(message.Chat.Id, data);
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
                 if (scanData.Symbol.Error == null)
