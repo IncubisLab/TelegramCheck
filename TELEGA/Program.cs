@@ -66,6 +66,7 @@ namespace Telegram.Bot.Examples.Echo
             };
 
             var check = checking.GetCheck(checkInfo);
+           
 
             StringBuilder str = new StringBuilder("");
             try
@@ -75,14 +76,29 @@ namespace Telegram.Bot.Examples.Echo
                     double sum = Convert.ToDouble(item.Sum) / 100;
                     str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
                 }
-             
                 await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
             }
             catch 
             { Console.WriteLine("Ошибка объекта");
               ParserQR_Code( input,  message);
             }
-            my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + message.Chat.Id + "');");
+            try
+            {
+                my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + message.Chat.Id + "');");
+            }
+            catch { }
+            
+                foreach (var item in check.Document.Receipt.Items)
+                {
+                    double sum = Convert.ToDouble(item.Sum) / 100;
+                    try
+                    {
+                        my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
+                    }
+                    catch { }
+                }
+           
+           
         }
         private static async void BotOnPhotoMassage(Message message)
         {

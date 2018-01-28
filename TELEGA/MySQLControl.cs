@@ -16,8 +16,11 @@ namespace TELEGA
 
         public void MySQL_Query(string command_text)
         {
-            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password);
+            
+            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
             MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            //my_connection.CharacterSet = "utf8";
+            
             my_connection.Open(); //Устанавливаем соединение с базой данных.
             MySqlDataReader MyDataReader = myCommand.ExecuteReader();
             while (MyDataReader.Read())
