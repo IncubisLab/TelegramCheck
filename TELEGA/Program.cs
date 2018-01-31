@@ -25,7 +25,7 @@ namespace Telegram.Bot.Examples.Echo
     {
         private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
         private static MySQLControl my_sql_control = new MySQLControl();
-
+        Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
         public static void Main(string[] args)
         {
             Bot.OnMessage += BotOnMessageReceived;

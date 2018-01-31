@@ -69,5 +69,27 @@ namespace TELEGA
             MyDataReader.Close();
             my_connection.Close();
         }
+
+        public List<String>  MySQLSelect(string command_text)
+        {
+            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            my_connection.Open(); //Устанавливаем соединение с базой данных.
+            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
+            List<string> tabel = new List<string>();
+            int index = 0;
+            while (MyDataReader.Read())
+            {
+                for (int k = 0; k < MyDataReader.GetString(index).LongCount(); k++)
+                {
+                    tabel.Add(MyDataReader.GetString(k));
+                }
+                index++;
+            }
+            //TODO: записать правильно таблицу (имя и данные)
+            MyDataReader.Close();
+            my_connection.Close();
+            return tabel;
+        }
     }
 }
