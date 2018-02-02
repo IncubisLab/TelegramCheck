@@ -35,12 +35,12 @@ namespace TELEGA
             } catch { }
         }
 
-        public void AddCheck(int id_check, string store_name, string address)
+        public void AddCheck(int id_check, string store_name, string address, string date_time)
         {
             try
             {
-                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address) 
-                VALUES ('" + id_check + "', '" + store_name + "', '" + address + "');");
+                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address, DateTime) 
+                VALUES ('" + id_check + "', '" + store_name + "', '" + address + "', '" + date_time + "');");
             } catch { }
         }
         public void AddProduct(Check check)
@@ -135,6 +135,23 @@ namespace TELEGA
             MyDataReader.Close();
             my_connection.Close();
             return tabel;
+        }
+
+        public List<CheckProduct> ResultCheck(string command_text)
+        {
+            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            my_connection.Open(); //Устанавливаем соединение с базой данных.
+            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
+            List<CheckProduct> check_product = new List<CheckProduct>();
+            while (MyDataReader.Read())
+            {
+                check_product.Add(new CheckProduct(MyDataReader.GetString(0), MyDataReader.GetString(2), 
+                                                   MyDataReader.GetString(1),MyDataReader.GetString(3)));
+            }
+            MyDataReader.Close();
+            my_connection.Close();
+            return check_product;
         }
     }
 }

@@ -11,6 +11,7 @@ using FSNCheck;
 using FSNCheck.Data;
 using Newtonsoft.Json;
 using TELEGA;
+using Telegram.Bot.Types.ReplyMarkups;
 
 
 namespace Telegram.Bot.Examples.Echo
@@ -32,7 +33,6 @@ namespace Telegram.Bot.Examples.Echo
             Console.WriteLine("Start listening for {0}", me.Username);
             Console.ReadKey();
             controlBot.Run_Qurey_Console(my_sql_control, Bot);
-           
         }
   
         private static string GET(string Url, string Data)
@@ -47,22 +47,15 @@ namespace Telegram.Bot.Examples.Echo
         }
         private static async void ParserQR_Code(string input, Message message)
         {
-            string fn = RegularExpressions(input, "fn=(\\d+)");
-            string fd = RegularExpressions(input, "i=(\\d+)");
-            string fp = RegularExpressions(input, "fp=(\\d+)");
-
             Checking checking = new Checking("+79817889931", "405381");
-
             CheckInfo checkInfo = new CheckInfo
             {
-                FN = fn,
-                FD = fd,
-                FS = fp
+                FN = RegularExpressions(input, "fn=(\\d+)"),
+                FD = RegularExpressions(input, "i=(\\d+)"),
+                FS = RegularExpressions(input, "fp=(\\d+)")
             };
 
             var check = checking.GetCheck(checkInfo);
-           
-
             StringBuilder str = new StringBuilder("");
             try
             {
@@ -73,66 +66,17 @@ namespace Telegram.Bot.Examples.Echo
                 }
                 await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
             }
-            catch 
-            { 
+            catch
+            {
                 Console.WriteLine("Ошибка объекта");
             }
+
             Console.WriteLine("Чек номер {0}", check.Document.Receipt.ShiftNumber);
             my_sql_control.AddStore(check.Document.Receipt.User, (int)message.Chat.Id);
-            my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, "***");
+            my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, 
+                                     check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime);
             my_sql_control.AddProduct(check);
-//            try
-//            {
-//                my_sql_control.MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + check.Document.Receipt.User + "', '" + message.Chat.Id + "');");
-//            }
-//            catch { }
-//            try
-//            {
-//                my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address) 
-//                VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + check.Document.Receipt.User + "', '???');");
-//            }
-//            catch { }
-           // InsertCheck(check.Document.Receipt.ShiftNumber, message.Chat.Id);
-           // InsertProduct(check);
-//            foreach (var item in check.Document.Receipt.Items)
-//            {
-//                double sum = Convert.ToDouble(item.Sum) / 100;
-//                //Random rnd = new Random();
-//                //rnd.Next(1000);
-//                //int seed = Convert.ToInt32(DateTime.Now.Millisecond.ToString());
-//                int cnr = new Random(DateTime.Now.Millisecond).Next(1000);
-//                try
-//                {
-//                    my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
-//                    VALUES ('" + cnr +"', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
-//                }
-//                catch 
-//                {
-                    
-//                }
-//            }
         }
-        //private static void InsertCheck(int chek_number, ValueType user_id)
-        //{
-        //    try
-        //    {
-        //       // my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + chek_number + "', '" + user_id + "');");
-                
-        //    }
-        //    catch { }
-        //}
-        //private static void InsertProduct(Check check)
-        //{
-        //    foreach (var item in check.Document.Receipt.Items)
-        //    {
-        //        double sum = Convert.ToDouble(item.Sum) / 100;
-        //        try
-        //        {
-        //            my_sql_control.MySQL_Insert("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
-        //        }
-        //        catch { }
-        //    }
-        //}
         private static async void BotOnPhotoMassage(Message message)
         {
             if (message.Type == MessageType.PhotoMessage)
@@ -142,19 +86,9 @@ namespace Telegram.Bot.Examples.Echo
                 string file_name = test.FilePath;
                 image.Save(test.FilePath);
 
-                string get =
-                    String.Format(
-                        "https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",
-                        file_name);
+                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",file_name);
                 string data = GET(get, "");
                 Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
-//                try
-//                {
-//                    my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
-//                                               VALUES ('"+ message.Chat.Id +"', '"+ message.Chat.FirstName +@"', 
-//                                                         '"+ message.Chat.LastName +"', '"+ message.Chat.Username +"');");
-//                }
-//                catch { };
                 my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
                 await Bot.SendTextMessageAsync(message.Chat.Id, data);
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
@@ -162,56 +96,52 @@ namespace Telegram.Bot.Examples.Echo
                 {
                     ParserQR_Code(scanData.Symbol.Data, message);
                 }
-               
             }
         }
-        private static void BotOnTextMessage(Message message)
+        private static async void BotOnTextMessage(Message message)
         {
            
-          
-
-            if (message.Type == MessageType.TextMessage && (message.Text != null))
+            if (message == null || message.Type != MessageType.TextMessage) return;
+            switch (message.Text.Split(' ').First())
             {
-                Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
-//                try
-//                {
-//                    my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
-//                                               VALUES ('" + message.Chat.Id + "', '" + message.Chat.FirstName + @"', 
-//                                                       '" + message.Chat.LastName + "', '" + message.Chat.Username + "');");
-//                }
-//                catch { };
-                my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
-                ParserQR_Code(message.Text, message);
+                case "/info":
+                    {
+
+                        if (message.Type == MessageType.TextMessage && (message.Text != null))
+                        {
+                            Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
+                            my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
+                            ParserQR_Code(message.Text, message);
+                        }
+                        break;
+                    }
+
+                case "/Product":
+                    {
+                        //message.Text = null;
+                        //await Bot.SendTextMessageAsync(message.Chat.Id, "Введите текс с QR-кодом!");
+                        string product = message.Text.Remove(0, message.Text.IndexOf(' ') + 1);
+                        Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
+                       
+                        foreach (var check in data_analysis.Parser_Check(product))
+                        {
+                            await Bot.SendTextMessageAsync(message.Chat.Id, string.Format("{0}   {1} руб.   {2}", check.Product_Name, 
+                                check.Product_Sum, check.Store_Name));
+                        }
+                        break;
+                    }
+                default:
+                    const string usage = @"Usage:
+/info   - Информация о продукте
+/Product - Инфо по продукту";
+
+                    await Bot.SendTextMessageAsync(
+                        message.Chat.Id,
+                        usage,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    break;
+
             }
-            //switch (message.Text.Split(' ').First())
-            //{
-            //    case "/info":
-            //        {
-            //            await Bot.SendTextMessageAsync(message.Chat.Id, "Who or Where are you?");
-            //            break;
-            //        }
-
-            //    case "/QR_Code":
-            //        {
-            //            //message.Text = null;
-            //            await Bot.SendTextMessageAsync(message.Chat.Id, "Введите текс с QR-кодом!");   
-
-                        //Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-                        //data_analysis.Search_Product_Check(message.Text);
-//                        break;
-//                    }
-//                default:
-//                    const string usage = @"Usage:
-///info   - Информация о продукте
-///QR_Code - Инфо по QR коду";
-
-//                    await Bot.SendTextMessageAsync(
-//                        message.Chat.Id,
-//                        usage,
-//                        replyMarkup: new ReplyKeyboardRemove());
-//                    break;
-      
-//            }
         }
         private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {

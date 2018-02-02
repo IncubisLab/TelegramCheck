@@ -21,5 +21,6 @@
         public string Operator { get; set; }
         public int Nds18 { get; set; }
         public int RequestNumber { get; set; }
+        public string RetailPlaceAddress { get; set; }
     }
 }

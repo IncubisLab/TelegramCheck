@@ -32,8 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FSNCheck">
-      <HintPath>..\..\FSNReq\FSNCheck\bin\Debug\FSNCheck.dll</HintPath>
+    <Reference Include="FSNCheck, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\FSNCheck\bin\Debug\FSNCheck.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -53,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckProduct.cs" />
     <Compile Include="ControlBot.cs" />
     <Compile Include="Data_Analysis.cs" />
     <Compile Include="MySQLControl.cs" />
