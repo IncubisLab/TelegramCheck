@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Adfa.Telegraph.Net, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Telegraph.Net.1.1.0\lib\net45\Adfa.Telegraph.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FSNCheck, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\FSNCheck\bin\Debug\FSNCheck.dll</HintPath>
