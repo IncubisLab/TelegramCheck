@@ -8,7 +8,6 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using FSNCheck;
-using FSNCheck.Data;
 using Newtonsoft.Json;
 using TELEGA;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -64,6 +63,7 @@ namespace Telegram.Bot.Examples.Echo
                     double sum = Convert.ToDouble(item.Sum) / 100;
                     str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
                 }
+
                 await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
             }
             catch
@@ -74,7 +74,7 @@ namespace Telegram.Bot.Examples.Echo
             Console.WriteLine("Чек номер {0}", check.Document.Receipt.ShiftNumber);
             my_sql_control.AddStore(check.Document.Receipt.User, (int)message.Chat.Id);
             my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, 
-                                     check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime);
+                                    check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime);
             my_sql_control.AddProduct(check);
         }
         private static async void BotOnPhotoMassage(Message message)
@@ -100,13 +100,11 @@ namespace Telegram.Bot.Examples.Echo
         }
         private static async void BotOnTextMessage(Message message)
         {
-           
             if (message == null || message.Type != MessageType.TextMessage) return;
             switch (message.Text.Split(' ').First())
             {
                 case "/info":
                     {
-
                         if (message.Type == MessageType.TextMessage && (message.Text != null))
                         {
                             Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
@@ -118,8 +116,6 @@ namespace Telegram.Bot.Examples.Echo
 
                 case "/Product":
                     {
-                        //message.Text = null;
-                        //await Bot.SendTextMessageAsync(message.Chat.Id, "Введите текс с QR-кодом!");
                         string product = message.Text.Remove(0, message.Text.IndexOf(' ') + 1);
                         Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
                        
@@ -135,12 +131,8 @@ namespace Telegram.Bot.Examples.Echo
 /info   - Информация о продукте
 /Product - Инфо по продукту";
 
-                    await Bot.SendTextMessageAsync(
-                        message.Chat.Id,
-                        usage,
-                        replyMarkup: new ReplyKeyboardRemove());
+                    await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
-
             }
         }
         private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)

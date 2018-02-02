@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FSNCheck.Data;
-using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+
 namespace TELEGA
 {
     class MySQLControl
     {
-       // private string m_connect = "Database=ibmx_2f92d9c8849688d;Data Source=eu-cdbr-sl-lhr-01.cleardb.net;User Id=b92be25f9296cd;Password=c92ecc39";
-        //private string m_user_id = "b92be25f9296cd";
-        //private string m_password = "c92ecc39";
-        //private string m_database = "ibmx_2f92d9c8849688d";
         private string m_user_id = "b4a5125e0c43c3";
         private string m_password = "25a56a14";
         private string m_database = "ibmsl_1873546bc5817409ce81";
         private string m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
-
-
         public void AddUsers(int id_user, string first_name, string last_name, string user_name)
         {
             try
@@ -97,46 +89,6 @@ namespace TELEGA
             MyDataReader.Close();
             my_connection.Close();
         }
-        public void MySQL_DeleteExampel(string command_text)
-        {
-            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
-            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
-            my_connection.Open(); //Устанавливаем соединение с базой данных.
-            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
-            while (MyDataReader.Read())
-            {
-
-            }
-            MyDataReader.Close();
-            my_connection.Close();
-        }
-
-        public List<String>  MySQLSelect(string command_text)
-        {
-            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
-            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
-            my_connection.Open(); //Устанавливаем соединение с базой данных.
-            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
-            List<string> tabel = new List<string>();
-            int index = 0;
-            while (MyDataReader.Read())
-            {
-                //for (int k = 0; k < MyDataReader.GetString(index).LongCount(); k++)
-                //{
-                //    tabel.Add(MyDataReader.GetString(k));
-                //}
-                //index++;
-                Console.WriteLine("{0} {1} {2} {3,5}", MyDataReader.GetString(0), MyDataReader.GetString(1), MyDataReader.GetString(2), 
-                                                                 MyDataReader.GetString(3));
-
-            }
-            Console.WriteLine("-----------------------------------");
-            //TODO: записать правильно таблицу (имя и данные)
-            MyDataReader.Close();
-            my_connection.Close();
-            return tabel;
-        }
-
         public List<CheckProduct> ResultCheck(string command_text)
         {
             MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");

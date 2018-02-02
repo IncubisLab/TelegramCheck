@@ -31,12 +31,15 @@ namespace TELEGA
                 }
                 catch { }
             }
-            if (text == "Input")
+            if (text == "Product")
             {
                 Console.WriteLine("Введите имя продукта ");
                 string product = Console.ReadLine();
                 Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-                data_analysis.Search_Product_Check(product);
+                foreach (var check in data_analysis.Parser_Check(product))
+                {
+                    Console.WriteLine("{0}   {1} руб.  кол х {2} {3}", check.Product_Name, check.Product_Sum, check.Product_Quantity, check.Store_Name);
+                }
             }
 
             else if (text == "Exit") { bot.StopReceiving(); Environment.Exit(0); }
