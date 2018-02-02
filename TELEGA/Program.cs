@@ -4,15 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineKeyboardButtons;
-using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.InputMessageContents;
-using Telegram.Bot.Types.ReplyMarkups;
 using FSNCheck;
 using FSNCheck.Data;
 using Newtonsoft.Json;
@@ -25,7 +19,7 @@ namespace Telegram.Bot.Examples.Echo
     {
         private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
         private static MySQLControl my_sql_control = new MySQLControl();
-       
+        private static ControlBot controlBot = new ControlBot();
         public static void Main(string[] args)
         {
             Bot.OnMessage += BotOnMessageReceived;
@@ -35,54 +29,18 @@ namespace Telegram.Bot.Examples.Echo
             Console.Title = me.Username;
 
             Bot.StartReceiving();
-            Console.WriteLine(string.Format("Start listening for {0}",me.Username));
+            Console.WriteLine("Start listening for {0}", me.Username);
             Console.ReadKey();
-            Select_Query();
+            controlBot.Run_Qurey_Console(my_sql_control, Bot);
            
         }
-        private static void Select_Query()
-        {
-            Console.WriteLine("Введите команду/");
-            string text = Console.ReadLine();
-            if (text == "Select")
-            {
-                Console.WriteLine("Введите номер чека");
-                string num = Console.ReadLine();
-                try
-                {
-                    my_sql_control.MySQL_SelectExampel("Select * From users, products Where products.id_check = '" + num + "'");
-                }catch { }   
-            }
-           if (text == "Delete")
-           {
-               Console.WriteLine("Введите номер чека");
-               string num = Console.ReadLine();
-               try
-               {
-                   my_sql_control.MySQL_SelectExampel("DELETE FROM ibmx_2f92d9c8849688d.products WHERE id_check='" + num + "'");
-                   my_sql_control.MySQL_SelectExampel("DELETE FROM ibmx_2f92d9c8849688d.check WHERE chek_number='" + num + "'");
-                   
-               }
-               catch { }   
-           }
-           if (text == "Input")
-           {
-               Console.WriteLine("Введите имя продукта ");
-               string product = Console.ReadLine();
-               Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-               data_analysis.Search_Product_Check(product);
-           }
-
-            else if (text == "Exit") { Bot.StopReceiving(); Environment.Exit(0); }
-            Select_Query();
-            
-        }
+  
         private static string GET(string Url, string Data)
         {
             System.Net.WebRequest req = System.Net.WebRequest.Create(Url + "?" + Data);
             System.Net.WebResponse resp = req.GetResponse();
-            System.IO.Stream stream = resp.GetResponseStream();
-            System.IO.StreamReader sr = new System.IO.StreamReader(stream);
+            Stream stream = resp.GetResponseStream();
+            StreamReader sr = new StreamReader(stream);
             string Out = sr.ReadToEnd();
             sr.Close();
             return Out;
@@ -116,72 +74,71 @@ namespace Telegram.Bot.Examples.Echo
                 await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
             }
             catch 
-            { Console.WriteLine("Ошибка объекта");
-              ParserQR_Code( input,  message);
+            { 
+                Console.WriteLine("Ошибка объекта");
             }
             Console.WriteLine("Чек номер {0}", check.Document.Receipt.ShiftNumber);
-            try
-            {
-               // my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + message.Chat.Id + "');");
-                my_sql_control.MySQL_Query("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + check.Document.Receipt.User + "', '" + message.Chat.Id + "');");
-            }
-            catch { }
-            try
-            {
-                my_sql_control.MySQL_Query(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address) 
-                VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + check.Document.Receipt.User + "', '???');");
-            }
-            catch { }
+            my_sql_control.AddStore(check.Document.Receipt.User, (int)message.Chat.Id);
+            my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, "***");
+            my_sql_control.AddProduct(check);
+//            try
+//            {
+//                my_sql_control.MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + check.Document.Receipt.User + "', '" + message.Chat.Id + "');");
+//            }
+//            catch { }
+//            try
+//            {
+//                my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address) 
+//                VALUES ('" + check.Document.Receipt.ShiftNumber + "', '" + check.Document.Receipt.User + "', '???');");
+//            }
+//            catch { }
            // InsertCheck(check.Document.Receipt.ShiftNumber, message.Chat.Id);
            // InsertProduct(check);
-            foreach (var item in check.Document.Receipt.Items)
-            {
-                double sum = Convert.ToDouble(item.Sum) / 100;
-                //Random rnd = new Random();
-                //rnd.Next(1000);
-                //int seed = Convert.ToInt32(DateTime.Now.Millisecond.ToString());
-                int cnr = new Random(DateTime.Now.Millisecond).Next(1000);
-                try
-                {
-                    //my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
-                    my_sql_control.MySQL_Query("INSERT INTO ibmsl_1873546bc5817409ce81.products (ID, ID_check, Product_name, Product_sum, Product_quantity) VALUES ('" + cnr +"', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
-                }
-                catch 
-                {
+//            foreach (var item in check.Document.Receipt.Items)
+//            {
+//                double sum = Convert.ToDouble(item.Sum) / 100;
+//                //Random rnd = new Random();
+//                //rnd.Next(1000);
+//                //int seed = Convert.ToInt32(DateTime.Now.Millisecond.ToString());
+//                int cnr = new Random(DateTime.Now.Millisecond).Next(1000);
+//                try
+//                {
+//                    my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
+//                    VALUES ('" + cnr +"', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
+//                }
+//                catch 
+//                {
                     
-                }
-            }
-           
-           
+//                }
+//            }
         }
-        private static void InsertCheck(int chek_number, ValueType user_id)
-        {
-            try
-            {
-               // my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + chek_number + "', '" + user_id + "');");
+        //private static void InsertCheck(int chek_number, ValueType user_id)
+        //{
+        //    try
+        //    {
+        //       // my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.check (chek_number, user_id) VALUES ('" + chek_number + "', '" + user_id + "');");
                 
-            }
-            catch { }
-        }
-        private static void InsertProduct(Check check)
-        {
-            foreach (var item in check.Document.Receipt.Items)
-            {
-                double sum = Convert.ToDouble(item.Sum) / 100;
-                try
-                {
-                    my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
-                }
-                catch { }
-            }
-        }
+        //    }
+        //    catch { }
+        //}
+        //private static void InsertProduct(Check check)
+        //{
+        //    foreach (var item in check.Document.Receipt.Items)
+        //    {
+        //        double sum = Convert.ToDouble(item.Sum) / 100;
+        //        try
+        //        {
+        //            my_sql_control.MySQL_Insert("INSERT INTO ibmx_2f92d9c8849688d.products (Product_name, id_check, Sum, Quantity) VALUES ('" + item.Name + "', '" + check.Document.Receipt.ShiftNumber + "', '" + sum + "', '" + item.Quantity + "');");
+        //        }
+        //        catch { }
+        //    }
+        //}
         private static async void BotOnPhotoMassage(Message message)
         {
             if (message.Type == MessageType.PhotoMessage)
             {
                 var test = await Bot.GetFileAsync(message.Photo[message.Photo.Count() - 1].FileId);
                 var image = Bitmap.FromStream(test.FileStream);
-                int num = message.Photo.Count() - 1;
                 string file_name = test.FilePath;
                 image.Save(test.FilePath);
 
@@ -191,14 +148,14 @@ namespace Telegram.Bot.Examples.Echo
                         file_name);
                 string data = GET(get, "");
                 Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
-                try
-                {
-                   // my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.users (idUsers, LastName, FirstName) VALUES ('" + message.Chat.Id + "', '" + message.Chat.LastName + "', '" + message.Chat.FirstName + "');");
-                    my_sql_control.MySQL_Query(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
-                                               VALUES ('"+ message.Chat.Id +"', '"+ message.Chat.FirstName +@"', 
-                                                         '"+ message.Chat.LastName +"', '"+ message.Chat.Username +"');");
-                }
-                catch { };
+//                try
+//                {
+//                    my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
+//                                               VALUES ('"+ message.Chat.Id +"', '"+ message.Chat.FirstName +@"', 
+//                                                         '"+ message.Chat.LastName +"', '"+ message.Chat.Username +"');");
+//                }
+//                catch { };
+                my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
                 await Bot.SendTextMessageAsync(message.Chat.Id, data);
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
                 if (scanData.Symbol.Error == null)
@@ -208,9 +165,24 @@ namespace Telegram.Bot.Examples.Echo
                
             }
         }
-        private static async void BotOnTextMessage(Message message)
+        private static void BotOnTextMessage(Message message)
         {
            
+          
+
+            if (message.Type == MessageType.TextMessage && (message.Text != null))
+            {
+                Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
+//                try
+//                {
+//                    my_sql_control.MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
+//                                               VALUES ('" + message.Chat.Id + "', '" + message.Chat.FirstName + @"', 
+//                                                       '" + message.Chat.LastName + "', '" + message.Chat.Username + "');");
+//                }
+//                catch { };
+                my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
+                ParserQR_Code(message.Text, message);
+            }
             //switch (message.Text.Split(' ').First())
             //{
             //    case "/info":
@@ -223,23 +195,9 @@ namespace Telegram.Bot.Examples.Echo
             //        {
             //            //message.Text = null;
             //            await Bot.SendTextMessageAsync(message.Chat.Id, "Введите текс с QR-кодом!");   
-                       
-//                        if (message.Type == MessageType.TextMessage && (message.Text != null))
-//                        {
-//                            Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
-//                            try
-//                            {
-//                                //my_sql_control.MySQL_Query("INSERT INTO ibmx_2f92d9c8849688d.users (idUsers, LastName, FirstName) VALUES ('" + message.Chat.Id + "', '" + message.Chat.LastName + "', '" + message.Chat.FirstName + "');");
-//                                my_sql_control.MySQL_Query(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
-//                                               VALUES ('" + message.Chat.Id + "', '" + message.Chat.FirstName + @"', 
-//                                                         '" + message.Chat.LastName + "', '" + message.Chat.Username + "');");
-//                            }
-//                            catch { };
-//                            ParserQR_Code(message.Text, message);
-//                        }
 
-                        Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-                        data_analysis.Search_Product_Check(message.Text);
+                        //Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
+                        //data_analysis.Search_Product_Check(message.Text);
 //                        break;
 //                    }
 //                default:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FSNCheck.Data;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 namespace TELEGA
@@ -12,19 +13,55 @@ namespace TELEGA
         //private string m_user_id = "b92be25f9296cd";
         //private string m_password = "c92ecc39";
         //private string m_database = "ibmx_2f92d9c8849688d";
-        //private string m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
         private string m_user_id = "b4a5125e0c43c3";
         private string m_password = "25a56a14";
         private string m_database = "ibmsl_1873546bc5817409ce81";
         private string m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
 
-        public void MySQL_Query(string command_text)
+
+        public void AddUsers(int id_user, string first_name, string last_name, string user_name)
         {
-            
+            try
+            {
+                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
+                             VALUES ('" + id_user + "', '" + first_name + "','" + last_name + "', '" + user_name + "');");
+            }catch { };
+        }
+        public void AddStore(string store_name, int id_user)
+        {
+            try
+            {
+                MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + store_name + "', '" + id_user + "');");
+            } catch { }
+        }
+
+        public void AddCheck(int id_check, string store_name, string address)
+        {
+            try
+            {
+                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address) 
+                VALUES ('" + id_check + "', '" + store_name + "', '" + address + "');");
+            } catch { }
+        }
+        public void AddProduct(Check check)
+        {
+            foreach (var item in check.Document.Receipt.Items)
+            {
+                double sum = Convert.ToDouble(item.Sum) / 100;
+                int random = new Random(DateTime.Now.Millisecond).Next(1000);
+                try
+                {
+                    MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
+                    VALUES ('" + random + "', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
+                } catch { }
+            }
+        }
+
+
+        public void MySQL_Insert(string command_text)
+        {
             MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
             MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
-            //my_connection.CharacterSet = "utf8";
-            
             my_connection.Open(); //Устанавливаем соединение с базой данных.
             MySqlDataReader MyDataReader = myCommand.ExecuteReader();
             while (MyDataReader.Read())

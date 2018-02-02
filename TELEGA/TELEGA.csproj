@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlBot.cs" />
     <Compile Include="Data_Analysis.cs" />
     <Compile Include="MySQLControl.cs" />
     <Compile Include="Program.cs" />
