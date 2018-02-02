@@ -9,9 +9,13 @@ namespace TELEGA
     class MySQLControl
     {
        // private string m_connect = "Database=ibmx_2f92d9c8849688d;Data Source=eu-cdbr-sl-lhr-01.cleardb.net;User Id=b92be25f9296cd;Password=c92ecc39";
-        private string m_user_id = "b92be25f9296cd";
-        private string m_password = "c92ecc39";
-        private string m_database = "ibmx_2f92d9c8849688d";
+        //private string m_user_id = "b92be25f9296cd";
+        //private string m_password = "c92ecc39";
+        //private string m_database = "ibmx_2f92d9c8849688d";
+        //private string m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
+        private string m_user_id = "b4a5125e0c43c3";
+        private string m_password = "25a56a14";
+        private string m_database = "ibmsl_1873546bc5817409ce81";
         private string m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
 
         public void MySQL_Query(string command_text)
@@ -80,12 +84,16 @@ namespace TELEGA
             int index = 0;
             while (MyDataReader.Read())
             {
-                for (int k = 0; k < MyDataReader.GetString(index).LongCount(); k++)
-                {
-                    tabel.Add(MyDataReader.GetString(k));
-                }
-                index++;
+                //for (int k = 0; k < MyDataReader.GetString(index).LongCount(); k++)
+                //{
+                //    tabel.Add(MyDataReader.GetString(k));
+                //}
+                //index++;
+                Console.WriteLine("{0} {1} {2} {3,5}", MyDataReader.GetString(0), MyDataReader.GetString(1), MyDataReader.GetString(2), 
+                                                                 MyDataReader.GetString(3));
+
             }
+            Console.WriteLine("-----------------------------------");
             //TODO: записать правильно таблицу (имя и данные)
             MyDataReader.Close();
             my_connection.Close();
