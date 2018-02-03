@@ -5,6 +5,11 @@ namespace TELEGA
 {
     class ControlBot
     {
+        /// <summary>
+        /// Управление ботом из консоли
+        /// </summary>
+        /// <param name="my_sql_control"></param>
+        /// <param name="bot"></param>
         public void Run_Qurey_Console(MySQLControl my_sql_control, TelegramBotClient bot)
         {
             Console.WriteLine("Введите команду/");

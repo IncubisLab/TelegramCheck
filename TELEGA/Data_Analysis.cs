@@ -13,6 +13,11 @@ namespace TELEGA
         {
             this.my_sql_control = my_sql_control;
         }
+        /// <summary>
+        /// SQL запрос по названию продукта 
+        /// </summary>
+        /// <param name="name_product"></param>
+        /// <returns>Получение списка продуктов </returns>
         public List<CheckProduct> Parser_Check(string name_product)
         {
            return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, st.Store_name

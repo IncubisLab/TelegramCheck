@@ -7,10 +7,25 @@ namespace TELEGA
 {
     class MySQLControl
     {
-        private string m_user_id = "b4a5125e0c43c3";
-        private string m_password = "25a56a14";
-        private string m_database = "ibmsl_1873546bc5817409ce81";
-        private string m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
+        private string m_user_id;
+        private string m_password;
+        private string m_database;
+        private string m_host;
+
+        public MySQLControl()
+        {
+            m_user_id = "b4a5125e0c43c3";
+            m_password = "25a56a14";
+            m_database = "ibmsl_1873546bc5817409ce81";
+            m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
+        }
+        /// <summary>
+        /// Добавление нового пользователя в БД
+        /// </summary>
+        /// <param name="id_user"></param>
+        /// <param name="first_name"></param>
+        /// <param name="last_name"></param>
+        /// <param name="user_name"></param>
         public void AddUsers(int id_user, string first_name, string last_name, string user_name)
         {
             try
@@ -19,6 +34,11 @@ namespace TELEGA
                              VALUES ('" + id_user + "', '" + first_name + "','" + last_name + "', '" + user_name + "');");
             }catch { };
         }
+        /// <summary>
+        /// Добавление нового магазина в БД
+        /// </summary>
+        /// <param name="store_name"></param>
+        /// <param name="id_user"></param>
         public void AddStore(string store_name, int id_user)
         {
             try
@@ -26,7 +46,13 @@ namespace TELEGA
                 MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + store_name + "', '" + id_user + "');");
             } catch { }
         }
-
+        /// <summary>
+        /// Добавление нового чека в БД
+        /// </summary>
+        /// <param name="id_check"></param>
+        /// <param name="store_name"></param>
+        /// <param name="address"></param>
+        /// <param name="date_time"></param>
         public void AddCheck(int id_check, string store_name, string address, string date_time)
         {
             try
@@ -35,6 +61,10 @@ namespace TELEGA
                 VALUES ('" + id_check + "', '" + store_name + "', '" + address + "', '" + date_time + "');");
             } catch { }
         }
+        /// <summary>
+        /// Добавление продуктов в БД
+        /// </summary>
+        /// <param name="check"></param>
         public void AddProduct(Check check)
         {
             foreach (var item in check.Document.Receipt.Items)
@@ -89,6 +119,11 @@ namespace TELEGA
             MyDataReader.Close();
             my_connection.Close();
         }
+        /// <summary>
+        /// Получение данных о чеке
+        /// </summary>
+        /// <param name="command_text"></param>
+        /// <returns> Запись данных в список </returns>
         public List<CheckProduct> ResultCheck(string command_text)
         {
             MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
