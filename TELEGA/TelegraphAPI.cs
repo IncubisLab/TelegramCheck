@@ -9,18 +9,50 @@ using Telegraph.Net.Models;
 
 namespace TELEGA
 {
-    class ControlTelegraph
+    class TelegraphAPI
     {
         private TelegraphClient m_client;
         private ITokenClient m_tokenClient;
         private List<NodeElement> m_node_element = new List<NodeElement>();
-
-        public ControlTelegraph()
+        /// <summary>
+        /// Иницилизация аккаунта телеграф по токену
+        /// </summary>
+        public TelegraphAPI()
         {
             m_client = new TelegraphClient();
             m_tokenClient = m_client.GetTokenClient("40b9813e6e0303023473d29a70eee7fd37342fbecabe0b7734bd0229d98a");
         }
-
+        /// <summary>
+        /// Удаление аккаунта
+        /// </summary>
+        public async void RevokeAccount()
+        {
+            // Revoke an access token
+            Account account = await m_tokenClient.RevokeAccessTokenAsync();
+        }
+        /// <summary>
+        /// Получение информации об аккаунте в телеграфе
+        /// </summary>
+        public async void GetAccountInfo()
+        {
+            Account account = await m_tokenClient.GetAccountInformationAsync(
+              AccountFields.ShortName | AccountFields.AuthorUrl | AccountFields.AuthorUrl
+            );
+        }
+        /// <summary>
+        /// Изменение информации об аккаунте
+        /// </summary>
+        public async void EditAccountInfo()
+        {
+            Account updatedAccount = await m_tokenClient.EditAccountInformationAsync(
+              "new-short-name",
+              "new-author-name",
+              "new-author-url"
+            );
+        }
+        /// <summary>
+        /// Создание страницы
+        /// </summary>
         public async void CreatePage()
         {
             Page newPage = await m_tokenClient.CreatePageAsync(
@@ -58,14 +90,34 @@ namespace TELEGA
             }
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
         }
-        public async void EditPage()
+        /// <summary>
+        /// Изменение существующей страницы
+        /// </summary>
+        /// <param name="product"></param>
+        public async void EditPage(string product)
         {
             Page editedPage = await m_tokenClient.EditPageAsync(
-             "Sample-Page1-02-03",
-             "Информация о чекe",
+            // "Sample-Page1-02-03-2",
+            "Sample-Page-02-03-16",
+             "Сравнение цен о продукте " + product,
              content: m_node_element.ToArray(), returnContent: true
              );
         }
-
+        /// <summary>
+        /// Информация о страницах на аккаунте Телеграф
+        /// </summary>
+        public void GetPageList()
+        {
+            var response = m_tokenClient.GetPageListAsync(0, 40).Result;
+            foreach (var page in response.Pages)
+            {
+                Console.WriteLine(page.Url);
+            }
+        }
+        public async void PageLimit()
+        {
+            // Get first 50 pages created by the account with the context access-token
+            PageList pageList = await m_tokenClient.GetPageListAsync(offset: 0, limit: 50);
+        }
     }
 }

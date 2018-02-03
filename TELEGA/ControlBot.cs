@@ -41,6 +41,11 @@ namespace TELEGA
                     Console.WriteLine("{0}   {1} руб.  кол х {2} {3}", check.Product_Name, check.Product_Sum, check.Product_Quantity, check.Store_Name);
                 }
             }
+            if (text == "Telegraph")
+            {
+                TelegraphAPI telegraphAPI = new TelegraphAPI();
+                telegraphAPI.GetPageList();
+            }    
 
             else if (text == "Exit") { bot.StopReceiving(); Environment.Exit(0); }
             Run_Qurey_Console(my_sql_control, bot);

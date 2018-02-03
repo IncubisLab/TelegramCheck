@@ -129,24 +129,19 @@ namespace Telegram.Bot.Examples.Echo
                 case "/Telegraph":
                     {
                         string product = message.Text.Remove(0, message.Text.IndexOf(' ') + 1);
-                        ControlTelegraph control_telegraph = new ControlTelegraph();
+                        TelegraphAPI control_telegraph = new TelegraphAPI();
                          Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
                          control_telegraph.AddListNodeElementNew(data_analysis.Parser_Check(product));
-                         control_telegraph.EditPage();
-                         await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page1-02-03");
+                         control_telegraph.EditPage(product);
+                         await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
                          //http://telegra.ph//Sample-Page1-02-03-2
-                        //foreach (var check in data_analysis.Parser_Check(product))
-                        //{
-                        //    await Bot.SendTextMessageAsync(message.Chat.Id, string.Format("{0}   {1} руб.   {2}", check.Product_Name,
-                        //        check.Product_Sum, check.Store_Name));
-                        //}
                         break;
                     }
                 default:
                     const string usage = @"Usage:
 /info   - Информация о продукте
 /Product - Инфо по продукту
-/Telegraph - Вывести информацию телеграф";
+/Telegraph - Вывести информацию в телеграф";
 
                     await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
