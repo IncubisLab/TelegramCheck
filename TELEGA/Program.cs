@@ -11,6 +11,7 @@ using FSNCheck;
 using Newtonsoft.Json;
 using TELEGA;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Collections.Generic;
 
 
 namespace Telegram.Bot.Examples.Echo
@@ -131,9 +132,17 @@ namespace Telegram.Bot.Examples.Echo
                         string product = message.Text.Remove(0, message.Text.IndexOf(' ') + 1);
                         TelegraphAPI control_telegraph = new TelegraphAPI();
                          Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-                         control_telegraph.AddListNodeElementNew(data_analysis.Parser_Check(product));
-                         control_telegraph.EditPage(product);
-                         await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+                         List<CheckProduct> products = data_analysis.Parser_Check(product);
+                         if (products.Count > 0)
+                         {
+                             control_telegraph.AddListNodeElementNew(products);
+                             control_telegraph.EditPage(product);
+                             await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+                         }
+                         else
+                         {
+                             await Bot.SendTextMessageAsync(message.Chat.Id, "Данного продукта нет в БД");
+                         }
                          //http://telegra.ph//Sample-Page1-02-03-2
                         break;
                     }

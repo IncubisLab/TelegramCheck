@@ -114,6 +114,9 @@ namespace TELEGA
                 Console.WriteLine(page.Url);
             }
         }
+        /// <summary>
+        /// Установить лимит на количество страниц в аккаунте
+        /// </summary>
         public async void PageLimit()
         {
             // Get first 50 pages created by the account with the context access-token
