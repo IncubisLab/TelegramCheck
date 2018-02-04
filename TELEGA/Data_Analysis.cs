@@ -46,7 +46,7 @@ namespace TELEGA
         {
             List<CheckProduct> products = new List<CheckProduct>();
             var keywords = File.ReadAllText("key_products.txt", Encoding.UTF8).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            var matches = Regex.Matches(product_name, @"\w+");
+            var matches = Regex.Matches(product_name.ToLower(), @"\w+");
             var result = matches.Cast<Match>()
                 .Select(m => m.Value)
                 .Where(keywords.Contains)
@@ -58,7 +58,7 @@ namespace TELEGA
                 if (e.Count >= 1 )
                 {
                    products.AddRange(Parser_Check(e.Product));
-                   Thread.Sleep(10);
+                   Thread.Sleep(100);
                 }
             }
             return products;
@@ -70,7 +70,7 @@ namespace TELEGA
             foreach (var item in check.Document.Receipt.Items)
             {
                 products.AddRange(Search_Key_Product(item.Name));
-                //Thread.Sleep(100);
+                Thread.Sleep(100);
             }
             return products;
         }

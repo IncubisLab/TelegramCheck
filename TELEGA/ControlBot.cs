@@ -50,8 +50,11 @@ namespace TELEGA
             {
                 TelegraphAPI telegraphAPI = new TelegraphAPI();
                 telegraphAPI.GetPageList();
-            }    
-
+            }
+                if (text == "Max")
+                {
+                   Console.WriteLine("Продуктов в БД всего {0}", my_sql_control.MaxProducts());
+                }
             else if (text == "Exit") { bot.StopReceiving(); Environment.Exit(0); }
             Run_Qurey_Console(my_sql_control, bot);
         }

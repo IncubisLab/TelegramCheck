@@ -73,16 +73,25 @@ namespace FSNCheck
             req.Headers.Add("ClientVersion: 1.4.1.3");
             // req.Headers.Add($"Authorization: Basic {baseAuth}");
             req.Headers.Add(string.Format("Authorization: Basic {0}", baseAuth));
-
-            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-
-            string outStr;
-
-            using (StreamReader stream = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
+           
+            
+            HttpWebResponse resp = null;
+            string outStr = null;
+            try
             {
-                outStr = stream.ReadToEnd();
+                resp = (HttpWebResponse)req.GetResponse();
+                using (StreamReader stream = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
+                {
+                    outStr = stream.ReadToEnd();
+                }
+            }
+            catch (WebException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Ответ сервера ФНС не получен!");
             }
 
+            if (outStr == null) return null;
             return ConvertJsonToCheck(outStr);
         }
     }

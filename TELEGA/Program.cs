@@ -27,7 +27,7 @@ namespace Telegram.Bot.Examples.Echo
             Bot.OnMessageEdited += BotOnMessageReceived;
 
             var me = Bot.GetMeAsync().Result;
-            Console.Title = me.Username;
+            Console.Title = "Telegram Бот запущен!";
 
             Bot.StartReceiving();
             Console.WriteLine("Start listening for {0}", me.Username);
@@ -56,7 +56,11 @@ namespace Telegram.Bot.Examples.Echo
             };
 
             var check = checking.GetCheck(checkInfo);
-           
+            if (check == null)
+            {
+                await Bot.SendTextMessageAsync(message.Chat.Id, "Ответ сервера ФНС не получен!\nВозможно чек невалидный!");
+                return;
+            }
             StringBuilder str = new StringBuilder("");
             try
             {
@@ -74,16 +78,15 @@ namespace Telegram.Bot.Examples.Echo
             }
 
             Console.WriteLine("Чек номер {0}", check.Document.Receipt.ShiftNumber);
+            Thread.Sleep(10);
             my_sql_control.AddStore(check.Document.Receipt.User, (int)message.Chat.Id);
+            Thread.Sleep(10);
             my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, 
-                                    check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime);
-            my_sql_control.AddProduct(check);
+                                    check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime, check);
+            //my_sql_control.AddProduct(check);
             Thread.Sleep(100); // пауза для закрытия БД
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
             TelegraphAPI control_telegraph = new TelegraphAPI();
-           // control_telegraph.AddListNodeElementNew(data_analysis.Search_Product(check));
-          //  control_telegraph.EditPage("по чеку");
-          //  await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
             List<CheckProduct> products = data_analysis.Search_Product(check);
             if (products.Count > 0)
             {

@@ -53,12 +53,14 @@ namespace TELEGA
         /// <param name="store_name"></param>
         /// <param name="address"></param>
         /// <param name="date_time"></param>
-        public void AddCheck(int id_check, string store_name, string address, string date_time)
+        public void AddCheck(int id_check, string store_name, string address, string date_time, Check check)
         {
             try
             {
                 MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address, DateTime) 
                 VALUES ('" + id_check + "', '" + store_name + "', '" + address + "', '" + date_time + "');");
+                
+                AddProduct(check);
             } catch { }
         }
         /// <summary>
@@ -67,19 +69,48 @@ namespace TELEGA
         /// <param name="check"></param>
         public void AddProduct(Check check)
         {
+            int count = MaxProducts();
             foreach (var item in check.Document.Receipt.Items)
             {
                 double sum = Convert.ToDouble(item.Sum) / 100;
-                int random = new Random(DateTime.Now.Millisecond).Next(1000);
+               // int random = new Random(DateTime.Now.Millisecond).Next(1000);
+                
                 try
                 {
                     MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
-                    VALUES ('" + random + "', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
+                    VALUES ('" + count + "', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
+                    count++;
                 } catch { }
+               
             }
         }
 
-
+        public int MaxProducts()
+        {
+            try
+            {
+               return MySQL_Max(@"SELECT Max(pr.ID) FROM ibmsl_1873546bc5817409ce81.products As pr");
+            }
+            catch 
+            {
+                return 0;
+            }
+        }
+        public int MySQL_Max(string command_text)
+        {
+            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            my_connection.Open(); //Устанавливаем соединение с базой данных.
+            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
+            int max = 0;
+            while (MyDataReader.Read())
+            {
+                max = MyDataReader.GetInt32(0);
+            }
+            MyDataReader.Close();
+            my_connection.Close();
+            return max;
+        }
         public void MySQL_Insert(string command_text)
         {
             MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
