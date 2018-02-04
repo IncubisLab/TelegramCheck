@@ -81,9 +81,20 @@ namespace Telegram.Bot.Examples.Echo
             Thread.Sleep(100); // пауза для закрытия БД
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
             TelegraphAPI control_telegraph = new TelegraphAPI();
-            control_telegraph.AddListNodeElementNew(data_analysis.Search_Product(check));
-            control_telegraph.EditPage("по чеку");
-            await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+           // control_telegraph.AddListNodeElementNew(data_analysis.Search_Product(check));
+          //  control_telegraph.EditPage("по чеку");
+          //  await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+            List<CheckProduct> products = data_analysis.Search_Product(check);
+            if (products.Count > 0)
+            {
+                control_telegraph.AddListNodeElementNew(products);
+                control_telegraph.EditPage("по чеку");
+                await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+            }
+            else
+            {
+                await Bot.SendTextMessageAsync(message.Chat.Id, "Данного продукта нет в БД");
+            }
         }
         private static async void BotOnPhotoMassage(Message message)
         {
@@ -98,6 +109,7 @@ namespace Telegram.Bot.Examples.Echo
                 string data = GET(get, "");
                 Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
                 my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
+                await Bot.SendTextMessageAsync(message.Chat.Id, "Данные по QR коду!");
                 await Bot.SendTextMessageAsync(message.Chat.Id, data);
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
                 if (scanData.Symbol.Error == null)

@@ -58,7 +58,7 @@ namespace TELEGA
                 if (e.Count >= 1 )
                 {
                    products.AddRange(Parser_Check(e.Product));
-                  // Thread.Sleep(100);
+                   Thread.Sleep(10);
                 }
             }
             return products;

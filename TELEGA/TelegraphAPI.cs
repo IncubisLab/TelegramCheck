@@ -91,6 +91,19 @@ namespace TELEGA
             }
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
         }
+        public void AddListNodeElem(List<CheckProduct> products, Data_Analysis data_analysis)
+        {
+            List<NodeElement> elem = new List<NodeElement>();
+
+            foreach (var product in products)
+            {
+                elem.Add(new NodeElement("b", null, "Продукт: "));
+                elem.Add(new NodeElement("li", null, product.Product_Name, new NodeElement("b", null, " Сумма: "),
+                         new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
+                         new NodeElement("text", null, product.Store_Name)));
+            }
+            m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
+        }
         /// <summary>
         /// Изменение существующей страницы
         /// </summary>
