@@ -81,6 +81,7 @@ namespace TELEGA
         public void AddListNodeElementNew(List<CheckProduct> products)
         {
             List<NodeElement> elem = new List<NodeElement>();
+            
             foreach (var product in products)
             {
                 elem.Add(new NodeElement("b", null, "Продукт: "));

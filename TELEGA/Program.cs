@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using TELEGA;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Collections.Generic;
-
+using System.Threading;
 
 namespace Telegram.Bot.Examples.Echo
 {
@@ -56,6 +56,7 @@ namespace Telegram.Bot.Examples.Echo
             };
 
             var check = checking.GetCheck(checkInfo);
+           
             StringBuilder str = new StringBuilder("");
             try
             {
@@ -77,6 +78,12 @@ namespace Telegram.Bot.Examples.Echo
             my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, 
                                     check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime);
             my_sql_control.AddProduct(check);
+            Thread.Sleep(100); // пауза для закрытия БД
+            Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
+            TelegraphAPI control_telegraph = new TelegraphAPI();
+            control_telegraph.AddListNodeElementNew(data_analysis.Search_Product(check));
+            control_telegraph.EditPage("по чеку");
+            await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
         }
         private static async void BotOnPhotoMassage(Message message)
         {
