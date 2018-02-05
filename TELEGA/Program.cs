@@ -169,7 +169,8 @@ namespace Telegram.Bot.Examples.Echo
                     const string usage = @"Usage:
 /info   - Информация о продукте
 /Product - Инфо по продукту
-/Telegraph - Вывести информацию в телеграф";
+/Telegraph - Вывести информацию в телеграф
+В случае ошибки писать @andrey_chshelokov";
 
                     await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
