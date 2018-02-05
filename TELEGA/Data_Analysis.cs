@@ -24,11 +24,20 @@ namespace TELEGA
         /// <returns>Получение списка продуктов </returns>
         public List<CheckProduct> Parser_Check(string name_product)
         {
-           return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, st.Store_name
+            try
+            {
+                return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, st.Store_name
                                          From ibmsl_1873546bc5817409ce81.products as pr, ibmsl_1873546bc5817409ce81.users as us, 
                                          ibmsl_1873546bc5817409ce81.store as st, ibmsl_1873546bc5817409ce81.`check` as ch
                                          Where us.ID_users = st.ID_users and st.Store_name = ch.Store_name and ch.ID_check = pr.ID_check
                                          and pr.Product_name LIKE '%" + name_product + "%'");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Достигнуто Max подключений!");
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
 
         public List<CheckProduct> Prser_Check_Product(string name_product, int number_check)
@@ -57,8 +66,10 @@ namespace TELEGA
                // Console.WriteLine("{0} : {1}", e.Word, e.Count);
                 if (e.Count >= 1 )
                 {
-                   products.AddRange(Parser_Check(e.Product));
-                   Thread.Sleep(100);
+                   List<CheckProduct> pr = Parser_Check(e.Product);
+                   if (pr == null) { Console.WriteLine("Достигнуто Max подключений!"); return null; }
+                   products.AddRange(pr);
+                 // Thread.Sleep(100);
                 }
             }
             return products;
@@ -69,8 +80,10 @@ namespace TELEGA
             List<CheckProduct> products = new List<CheckProduct>();
             foreach (var item in check.Document.Receipt.Items)
             {
-                products.AddRange(Search_Key_Product(item.Name));
-                Thread.Sleep(100);
+                List<CheckProduct> pr = Search_Key_Product(item.Name);
+                if (pr == null) { Console.WriteLine("Достигнуто Max подключений!"); return null; }
+                products.AddRange(pr);
+                //Thread.Sleep(100);
             }
             return products;
         }

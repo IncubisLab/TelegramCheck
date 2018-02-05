@@ -85,6 +85,11 @@ namespace Telegram.Bot.Examples.Echo
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
             TelegraphAPI control_telegraph = new TelegraphAPI();
             List<CheckProduct> products = data_analysis.Search_Product(check);
+            if (products == null) 
+            {
+                await Bot.SendTextMessageAsync(message.Chat.Id, "Достигнуто Max подключений!\n Повторите попытку позже!");
+                return; 
+            }
             if (products.Count > 0)
             {
                 control_telegraph.AddListNodeElementNew(products);
