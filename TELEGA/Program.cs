@@ -170,6 +170,15 @@ namespace Telegram.Bot.Examples.Echo
                          //http://telegra.ph//Sample-Page1-02-03-2
                         break;
                     }
+                case "/Stop":
+                    {
+                        foreach (var user in my_sql_control.ID_Users())
+                        {
+                            await Bot.SendTextMessageAsync(user, "Бот остановлен по техническим причинам!");
+                        }
+                        Console.WriteLine("Бот отсановлен!");
+                        break;
+                    }
                 default:
                     const string usage = @"Usage:
 /info   - Информация о продукте

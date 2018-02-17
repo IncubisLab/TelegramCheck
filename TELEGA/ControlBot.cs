@@ -10,7 +10,7 @@ namespace TELEGA
         /// </summary>
         /// <param name="my_sql_control"></param>
         /// <param name="bot"></param>
-        public void Run_Qurey_Console(MySQLControl my_sql_control, TelegramBotClient bot)
+        public async void Run_Qurey_Console(MySQLControl my_sql_control, TelegramBotClient bot)
         {
             Console.WriteLine("Введите команду/");
             switch (Console.ReadLine())
@@ -57,6 +57,13 @@ namespace TELEGA
                 case "Max":
                     {
                         Console.WriteLine("Продуктов в БД всего {0}", my_sql_control.MaxProducts());
+                        break;
+                    }
+                case "Stop":
+                    {
+                      
+                        await bot.SendTextMessageAsync(397600634, "Бот остановлен по техническим причинам!");
+                        Console.WriteLine("Бот отсановлен!");
                         break;
                     }
                 case "Exit":

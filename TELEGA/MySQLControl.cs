@@ -85,6 +85,19 @@ namespace TELEGA
             }
         }
 
+
+        public List<string> ID_Users()
+        {
+            try
+            {
+              return MySQL_Select_Users(@"SELECT ID_users FROM ibmsl_1873546bc5817409ce81.users;");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public int MaxProducts()
         {
             try
@@ -150,6 +163,24 @@ namespace TELEGA
             MyDataReader.Close();
             my_connection.Close();
         }
+
+        public List<string> MySQL_Select_Users(string command_text)
+        {
+            List<string> users = new List<string>();
+            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            my_connection.Open(); //Устанавливаем соединение с базой данных.
+            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
+            while (MyDataReader.Read())
+            {
+                users.Add(MyDataReader.GetString(0));
+            }
+            MyDataReader.Close();
+            my_connection.Close();
+            return users;
+        }
+
+
         /// <summary>
         /// Получение данных о чеке
         /// </summary>
