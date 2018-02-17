@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineKeyboardButtons;
 using FSNCheck;
 using Newtonsoft.Json;
 using TELEGA;
@@ -25,6 +26,7 @@ namespace Telegram.Bot.Examples.Echo
         {
             Bot.OnMessage += BotOnMessageReceived;
             Bot.OnMessageEdited += BotOnMessageReceived;
+            Bot.OnCallbackQuery += BotOnCallbackQuery;
             var me = Bot.GetMeAsync().Result;
             Console.Title = "Telegram Бот "+ me.Username +" запущен!";
             Bot.StartReceiving();
@@ -126,6 +128,7 @@ namespace Telegram.Bot.Examples.Echo
         private static async void BotOnTextMessage(Message message)
         {
             if (message == null || message.Type != MessageType.TextMessage) return;
+            bool flag = false;
             switch (message.Text.Split(' ').First())
             {
                 case "/info":
@@ -179,6 +182,18 @@ namespace Telegram.Bot.Examples.Echo
                         Console.WriteLine("Бот отсановлен!");
                         break;
                     }
+                case "/Start":
+                    {
+                        var keyboard = new InlineKeyboardMarkup(new[] {
+                            new []
+                            {
+                                InlineKeyboardButton.WithCallbackData("Регистрация"),
+                                InlineKeyboardButton.WithCallbackData("Авторизация"),
+                            }
+                         });
+                        await Bot.SendTextMessageAsync(message.Chat.Id, "Для работы бота необходимо авторизоваться или зарегестрироваться в системе ФНС!", ParseMode.Default, false, false, 0, keyboard);
+                        break;
+                    }
                 default:
                     const string usage = @"Usage:
 /info   - Информация о продукте
@@ -188,6 +203,31 @@ namespace Telegram.Bot.Examples.Echo
 
                     await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
+            }
+        }
+        private static async void BotOnCallbackQuery(object sender, CallbackQueryEventArgs ev)
+        {
+            var message_ev = ev.CallbackQuery.Message;
+            if (ev.CallbackQuery.Data == "Регистрация")
+            {
+                await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Зарегестрируйтесь в системе ФНС", false);
+                var keyboard = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+                {
+                    Keyboard = new[] {
+                                        new[] // row 1
+                                               {
+                                                   new KeyboardButton("Телефон") { RequestContact = true }
+                                               },
+                                            },
+                    ResizeKeyboard = true
+                };
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите номер телефона", ParseMode.Default, false, false, 0, keyboard);
+            }
+            if (ev.CallbackQuery.Data == "Авторизация")
+            {
+                await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Авторизуйтесь в системе ФНС", false);
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите логин и пароль для авторизации как напримрие!");
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, string.Format("login:andrey {0}password:xxxxx", Environment.NewLine));
             }
         }
         private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
