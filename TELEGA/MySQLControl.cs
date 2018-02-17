@@ -34,6 +34,13 @@ namespace TELEGA
                              VALUES ('" + id_user + "', '" + first_name + "','" + last_name + "', '" + user_name + "');");
             }catch { };
         }
+        public void UpdateUsers(string fns_login, string fns_password, int id_user)
+        {
+            try
+            {
+                MySQL_Insert(@"UPDATE ibmsl_1873546bc5817409ce81.users SET FNS_login='"+fns_login+"', FNS_password='"+fns_password+"' WHERE ID_users='"+id_user+"';");
+            }catch { };
+        }
         /// <summary>
         /// Добавление нового магазина в БД
         /// </summary>

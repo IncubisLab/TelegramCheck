@@ -128,7 +128,6 @@ namespace Telegram.Bot.Examples.Echo
         private static async void BotOnTextMessage(Message message)
         {
             if (message == null || message.Type != MessageType.TextMessage) return;
-            bool flag = false;
             switch (message.Text.Split(' ').First())
             {
                 case "/info":
@@ -205,6 +204,14 @@ namespace Telegram.Bot.Examples.Echo
                     break;
             }
         }
+        private static async void ParserAuthorization(Message message)
+        {
+            string login = RegularExpressions(message.Text, "login:(\\d+)");
+            //await Bot.SendTextMessageAsync(text_message.Chat.Id, "Ваш логин:"+login);
+            string password = RegularExpressions(message.Text, "password:(\\d+)");
+           // await Bot.SendTextMessageAsync(text_message.Chat.Id, "Ваш пароль:"+password);
+            my_sql_control.UpdateUsers(login, password, (int)message.Chat.Id);
+        }
         private static async void BotOnCallbackQuery(object sender, CallbackQueryEventArgs ev)
         {
             var message_ev = ev.CallbackQuery.Message;
@@ -235,6 +242,7 @@ namespace Telegram.Bot.Examples.Echo
             var message = messageEventArgs.Message;
             BotOnPhotoMassage(message);
             BotOnTextMessage(message);
+            ParserAuthorization(message);
         }
         private static string RegularExpressions(string input, string pattern)
         {
