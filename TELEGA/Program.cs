@@ -205,6 +205,12 @@ namespace Telegram.Bot.Examples.Echo
                         ParserAuthorization(message);
                         break;
                     }
+                case "/reg":
+                    {
+                        Checking chek = new Checking();
+                        chek.RegistrationFNS("+79006226297", "ande75357@gmail.com", "Andrey");
+                        break;
+                    }
                 default:
                     const string usage = @"Использование:
 /info   - Информация о продукте

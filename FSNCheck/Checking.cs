@@ -17,6 +17,28 @@ namespace FSNCheck
             _login = login;
             _password = password;
         }
+        public Checking() { }
+
+        public void RegistrationFNS(string phone, string email, string name)
+        {
+            string outStr = null;
+            string url = "http://proverkacheka.nalog.ru:9999/v1/mobile/users/signup"+ "?phone:"+phone + "?email:" + email + "?name:" + name;
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+            req.Host = "proverkacheka.nalog.ru:9999";
+           // req.KeepAlive = true;
+         //   req.Accept = "Encoding: gzip";
+            req.UserAgent = "okhttp/3.0.1";
+            req.Headers.Add("Device-Id: FB8B0D6048904DBC8895EAC25F583E96");
+            req.Headers.Add("Device-OS: Adnroid 4.4.4");
+            req.Headers.Add("Version: 2");
+            req.Headers.Add("ClientVersion: 1.4.4.1");
+            req.GetResponse();
+            //using (StreamReader stream = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
+            //{
+            //    outStr = stream.ReadToEnd();
+            //}
+            //Console.WriteLine(outStr);
+        }
 
         private string GetAuthToken()
         {
