@@ -19,7 +19,8 @@ namespace Telegram.Bot.Examples.Echo
 {
     public static class Program
     {
-        private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
+        //private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
+        private static readonly TelegramBotClient Bot = new TelegramBotClient("546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI");
         private static MySQLControl my_sql_control = new MySQLControl();
         private static ControlBot controlBot = new ControlBot();
         public static void Main(string[] args)
@@ -47,7 +48,9 @@ namespace Telegram.Bot.Examples.Echo
         }
         private static async void ParserQR_Code(string input, Message message)
         {
-            Checking checking = new Checking("+79817889931", "405381");
+            my_sql_control.AccountFNS((int)message.Chat.Id);
+
+            Checking checking = new Checking(my_sql_control.FNS_Login, my_sql_control.FNS_Password);
             CheckInfo checkInfo = new CheckInfo
             {
                 FN = RegularExpressions(input, "fn=(\\d+)"),
@@ -112,10 +115,11 @@ namespace Telegram.Bot.Examples.Echo
                 string file_name = test.FilePath;
                 image.Save(test.FilePath);
 
-                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",file_name);
+              //  string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",file_name);
+                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI/{0}", file_name);
                 string data = GET(get, "");
                 Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
-                my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
+              
                 await Bot.SendTextMessageAsync(message.Chat.Id, "Данные по QR коду!");
                 await Bot.SendTextMessageAsync(message.Chat.Id, data);
                 ScanData scanData = JsonConvert.DeserializeObject<ScanData>(data.Replace('[', ' ').Replace(']', ' '));
@@ -128,6 +132,7 @@ namespace Telegram.Bot.Examples.Echo
         private static async void BotOnTextMessage(Message message)
         {
             if (message == null || message.Type != MessageType.TextMessage) return;
+           
             switch (message.Text.Split(' ').First())
             {
                 case "/info":
@@ -135,7 +140,7 @@ namespace Telegram.Bot.Examples.Echo
                         if (message.Type == MessageType.TextMessage && (message.Text != null))
                         {
                             Console.WriteLine("Пользователь: {0} загрузил данные чека", message.Chat.Username);
-                            my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
+                          //  my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username);
                             ParserQR_Code(message.Text, message);
                         }
                         break;
@@ -174,14 +179,16 @@ namespace Telegram.Bot.Examples.Echo
                     }
                 case "/Stop":
                     {
-                        foreach (var user in my_sql_control.ID_Users())
-                        {
-                            await Bot.SendTextMessageAsync(user, "Бот остановлен по техническим причинам!");
-                        }
+                        //foreach (var user in my_sql_control.ID_Users())
+                        //{
+                        //    await Bot.SendTextMessageAsync(user, "Бот остановлен по техническим причинам!");
+                        //}
+                        await Bot.SendTextMessageAsync(message.Chat.Id, "Пройди процес регестрации под своим аккаунтом ФНС!"+ Environment.NewLine + "/start");
+                        //Бот обновлен, для дальнейшего использования бота необходима авторизоваться под своим аккаунтов ФНС! Используете /start
                         Console.WriteLine("Бот отсановлен!");
                         break;
                     }
-                case "/Start":
+                case "/start":
                     {
                         var keyboard = new InlineKeyboardMarkup(new[] {
                             new []
@@ -193,12 +200,17 @@ namespace Telegram.Bot.Examples.Echo
                         await Bot.SendTextMessageAsync(message.Chat.Id, "Для работы бота необходимо авторизоваться или зарегестрироваться в системе ФНС!", ParseMode.Default, false, false, 0, keyboard);
                         break;
                     }
+                case "/authorization":
+                    {
+                        ParserAuthorization(message);
+                        break;
+                    }
                 default:
-                    const string usage = @"Usage:
+                    const string usage = @"Использование:
 /info   - Информация о продукте
 /Product - Инфо по продукту
 /Telegraph - Вывести информацию в телеграф
-В случае ошибки писать @andrey_chshelokov";
+В случае ошибки писать https://t.me/joinchat/F7LnehCPgzY5b8sfHwN6KA";
 
                     await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
@@ -206,11 +218,13 @@ namespace Telegram.Bot.Examples.Echo
         }
         private static async void ParserAuthorization(Message message)
         {
-            string login = RegularExpressions(message.Text, "login:(\\d+)");
-            //await Bot.SendTextMessageAsync(text_message.Chat.Id, "Ваш логин:"+login);
+            string login = "+" + RegularExpressions(message.Text, "login:(\\d+)");
+            //await Bot.SendTextMessageAsync(message.Chat.Id, "Ваш логин:" + login);
             string password = RegularExpressions(message.Text, "password:(\\d+)");
-           // await Bot.SendTextMessageAsync(text_message.Chat.Id, "Ваш пароль:"+password);
-            my_sql_control.UpdateUsers(login, password, (int)message.Chat.Id);
+          //  await Bot.SendTextMessageAsync(message.Chat.Id, "Ваш пароль:" + password);
+            my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username, login, password);
+            await Bot.SendTextMessageAsync(message.Chat.Id, "Данные записаны!");
+         //   my_sql_control.UpdateUsers(login, password, (int)message.Chat.Id);
         }
         private static async void BotOnCallbackQuery(object sender, CallbackQueryEventArgs ev)
         {
@@ -234,7 +248,7 @@ namespace Telegram.Bot.Examples.Echo
             {
                 await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Авторизуйтесь в системе ФНС", false);
                 await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите логин и пароль для авторизации как напримрие!");
-                await Bot.SendTextMessageAsync(message_ev.Chat.Id, string.Format("login:andrey {0}password:xxxxx", Environment.NewLine));
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, string.Format("/authorization {0}login:andrey {0}password:xxxxx", Environment.NewLine));
             }
         }
         private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
@@ -242,7 +256,7 @@ namespace Telegram.Bot.Examples.Echo
             var message = messageEventArgs.Message;
             BotOnPhotoMassage(message);
             BotOnTextMessage(message);
-            ParserAuthorization(message);
+           
         }
         private static string RegularExpressions(string input, string pattern)
         {
@@ -250,5 +264,9 @@ namespace Telegram.Bot.Examples.Echo
             Match match = regex.Match(input);
             return match.Groups[1].Value;
         }
+
+
+
+
     }
 }

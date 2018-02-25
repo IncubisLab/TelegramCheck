@@ -1,5 +1,6 @@
 ﻿using System;
 using Telegram.Bot;
+using System.Threading;
 
 namespace TELEGA
 {
@@ -64,6 +65,7 @@ namespace TELEGA
                       
                         await bot.SendTextMessageAsync(397600634, "Бот остановлен по техническим причинам!");
                         Console.WriteLine("Бот отсановлен!");
+                        Thread.Sleep(100);
                         break;
                     }
                 case "Exit":

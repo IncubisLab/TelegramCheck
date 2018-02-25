@@ -26,13 +26,17 @@ namespace TELEGA
         /// <param name="first_name"></param>
         /// <param name="last_name"></param>
         /// <param name="user_name"></param>
-        public void AddUsers(int id_user, string first_name, string last_name, string user_name)
+        public void AddUsers(int id_user, string first_name, string last_name, string user_name, string fns_login, string fns_password)
         {
             try
             {
-                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name) 
-                             VALUES ('" + id_user + "', '" + first_name + "','" + last_name + "', '" + user_name + "');");
-            }catch { };
+                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name, FNS_login, FNS_password) 
+                             VALUES ('" + id_user + "', '" + first_name + "','" + last_name + "', '" + user_name + "', '" + fns_login + "', '" + fns_password + "');");
+            }
+            catch 
+            {
+                UpdateUsers(fns_login, fns_password, id_user);
+            };
         }
         public void UpdateUsers(string fns_login, string fns_password, int id_user)
         {
@@ -41,6 +45,19 @@ namespace TELEGA
                 MySQL_Insert(@"UPDATE ibmsl_1873546bc5817409ce81.users SET FNS_login='"+fns_login+"', FNS_password='"+fns_password+"' WHERE ID_users='"+id_user+"';");
             }catch { };
         }
+
+        public void AccountFNS(int id_user)
+        {
+            try 
+            {
+                MySQL_SelectAccountFNS(@"SELECT FNS_login, FNS_password FROM ibmsl_1873546bc5817409ce81.users where ID_users = '"+id_user+"'");
+            }
+            catch
+            {
+
+            };
+        }
+
         /// <summary>
         /// Добавление нового магазина в БД
         /// </summary>
@@ -48,9 +65,10 @@ namespace TELEGA
         /// <param name="id_user"></param>
         public void AddStore(string store_name, int id_user)
         {
+            string store_name_new = store_name.Replace("'", " ").Trim();
             try
             {
-                MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + store_name + "', '" + id_user + "');");
+                MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + store_name_new + "', '" + id_user + "');");
             } catch { }
         }
         /// <summary>
@@ -62,10 +80,11 @@ namespace TELEGA
         /// <param name="date_time"></param>
         public void AddCheck(int id_check, string store_name, string address, string date_time, Check check)
         {
+            string store_name_new = store_name.Replace("'", " ").Trim();
             try
             {
                 MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address, DateTime) 
-                VALUES ('" + id_check + "', '" + store_name + "', '" + address + "', '" + date_time + "');");
+                VALUES ('" + id_check + "', '" + store_name_new + "', '" + address + "', '" + date_time + "');");
                 
                 AddProduct(check);
             } catch { }
@@ -170,6 +189,23 @@ namespace TELEGA
             MyDataReader.Close();
             my_connection.Close();
         }
+        public void MySQL_SelectAccountFNS(string command_text)
+        {
+
+            MySqlConnection my_connection = new MySqlConnection("Database=" + m_database + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            my_connection.Open(); //Устанавливаем соединение с базой данных.
+            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
+            while (MyDataReader.Read())
+            {
+                m_fns_login = MyDataReader.GetString(0);
+                m_fns_password = MyDataReader.GetString(1);
+            }
+
+            MyDataReader.Close();
+            my_connection.Close();
+        }
+
 
         public List<string> MySQL_Select_Users(string command_text)
         {
@@ -209,5 +245,18 @@ namespace TELEGA
             my_connection.Close();
             return check_product;
         }
+
+
+        public string FNS_Login
+        {
+            get { return m_fns_login; }
+        }
+        public string FNS_Password
+        {
+            get { return m_fns_password; }
+        }
+
+        private string m_fns_login;
+        private string m_fns_password;
     }
 }
