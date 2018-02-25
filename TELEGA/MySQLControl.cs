@@ -204,6 +204,7 @@ namespace TELEGA
 
             MyDataReader.Close();
             my_connection.Close();
+
         }
 
 
