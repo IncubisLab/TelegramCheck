@@ -8,9 +8,9 @@ namespace TELEGA
 {
     class ProductStandart
     {
-        private string Product_name;
-        private string Product_brand;
-        private string Refinement;
+        public string Product_name;
+        public string Product_brand;
+        public string Refinement;
 
         public ProductStandart(string product_name, string product_brand, string refinement)
         {

@@ -86,7 +86,7 @@ namespace Telegram.Bot.Examples.Echo
             Thread.Sleep(10);
             my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber, check.Document.Receipt.User, 
                                     check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime, check);
-            Thread.Sleep(100); // пауза для закрытия БД
+           // Thread.Sleep(100); // пауза для закрытия БД
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
             TelegraphAPI control_telegraph = new TelegraphAPI();
             List<CheckProduct> products = data_analysis.Search_Product(check);
