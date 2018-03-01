@@ -14,10 +14,10 @@ namespace TELEGA
 
         public MySQLControl()
         {
-            m_user_id = "b4a5125e0c43c3";
-            m_password = "25a56a14";
-            m_database = "ibmsl_1873546bc5817409ce81";
-            m_host = "eu-cdbr-sl-lhr-01.cleardb.net";
+            m_user_id = "Master";
+            m_password = "Telegram";
+            m_database = "CheckTelegram";
+            m_host = "mybasetelegram.cswjqwlmeojz.us-west-2.rds.amazonaws.com";
         }
         /// <summary>
         /// Добавление нового пользователя в БД
@@ -30,7 +30,7 @@ namespace TELEGA
         {
             try
             {
-                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.users (ID_users, First_name, Last_name, User_name, FNS_login, FNS_password) 
+                MySQL_Insert(@"INSERT INTO CheckTelegram.users (ID_users, First_name, Last_name, User_name, FNS_login, FNS_password) 
                              VALUES ('" + id_user + "', '" + first_name + "','" + last_name + "', '" + user_name + "', '" + fns_login + "', '" + fns_password + "');");
             }
             catch 
@@ -42,7 +42,7 @@ namespace TELEGA
         {
             try
             {
-                MySQL_Insert(@"UPDATE ibmsl_1873546bc5817409ce81.users SET FNS_login='"+fns_login+"', FNS_password='"+fns_password+"' WHERE ID_users='"+id_user+"';");
+                MySQL_Insert(@"UPDATE CheckTelegram.users SET FNS_login='" + fns_login + "', FNS_password='" + fns_password + "' WHERE ID_users='" + id_user + "';");
             }catch { };
         }
 
@@ -50,7 +50,7 @@ namespace TELEGA
         {
             try 
             {
-                MySQL_SelectAccountFNS(@"SELECT FNS_login, FNS_password FROM ibmsl_1873546bc5817409ce81.users where ID_users = '"+id_user+"'");
+                MySQL_SelectAccountFNS(@"SELECT FNS_login, FNS_password FROM CheckTelegram.users where ID_users = '" + id_user + "'");
             }
             catch
             {
@@ -68,7 +68,7 @@ namespace TELEGA
             string store_name_new = store_name.Replace("'", " ").Trim();
             try
             {
-                MySQL_Insert("INSERT INTO ibmsl_1873546bc5817409ce81.store (Store_name, ID_users) VALUES ('" + store_name_new + "', '" + id_user + "');");
+                MySQL_Insert("INSERT INTO CheckTelegram.store (Store_name, ID_users) VALUES ('" + store_name_new + "', '" + id_user + "');");
             } catch { }
         }
         /// <summary>
@@ -83,7 +83,7 @@ namespace TELEGA
             string store_name_new = store_name.Replace("'", " ").Trim();
             try
             {
-                MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.check (ID_check, Store_name, Address, DateTime) 
+                MySQL_Insert(@"INSERT INTO CheckTelegram.check (ID_check, Store_name, Address, DateTime) 
                 VALUES ('" + id_check + "', '" + store_name_new + "', '" + address + "', '" + date_time + "');");
                 
                 AddProduct(check);
@@ -103,7 +103,7 @@ namespace TELEGA
                 
                 try
                 {
-                    MySQL_Insert(@"INSERT INTO ibmsl_1873546bc5817409ce81.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
+                    MySQL_Insert(@"INSERT INTO CheckTelegram.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
                     VALUES ('" + count + "', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
                     count++;
                 } catch { }
@@ -116,7 +116,7 @@ namespace TELEGA
         {
             try
             {
-              return MySQL_Select_Users(@"SELECT ID_users FROM ibmsl_1873546bc5817409ce81.users;");
+                return MySQL_Select_Users(@"SELECT ID_users FROM CheckTelegram.users;");
             }
             catch
             {
@@ -128,7 +128,7 @@ namespace TELEGA
         {
             try
             {
-               return MySQL_Max(@"SELECT Max(pr.ID) FROM ibmsl_1873546bc5817409ce81.products As pr");
+                return MySQL_Max(@"SELECT Max(pr.ID) FROM CheckTelegram.products As pr");
             }
             catch 
             {

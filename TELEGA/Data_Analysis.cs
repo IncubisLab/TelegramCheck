@@ -27,8 +27,8 @@ namespace TELEGA
             try
             {
                 return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, st.Store_name
-                                         From ibmsl_1873546bc5817409ce81.products as pr, ibmsl_1873546bc5817409ce81.users as us, 
-                                         ibmsl_1873546bc5817409ce81.store as st, ibmsl_1873546bc5817409ce81.`check` as ch
+                                         From CheckTelegram.products as pr, CheckTelegram.users as us, 
+                                         CheckTelegram.store as st, CheckTelegram.`check` as ch
                                          Where us.ID_users = st.ID_users and st.Store_name = ch.Store_name and ch.ID_check = pr.ID_check
                                          and pr.Product_name LIKE '%" + name_product + "%'");
             }
@@ -43,7 +43,7 @@ namespace TELEGA
         public List<CheckProduct> Prser_Check_Product(string name_product, int number_check)
         {
            return my_sql_control.ResultCheck(@"SELECT distinct pr.ID_check, pr.Product_name, pr.Product_sum, pr.Product_quantity 
-                                         FROM ibmsl_1873546bc5817409ce81.products As pr
+                                         FROM CheckTelegram.products As pr
                                          where pr.Product_name like '%" + name_product + "%' and pr.ID_check = " + number_check);
         }
 

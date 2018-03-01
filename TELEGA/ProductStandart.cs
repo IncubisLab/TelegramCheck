@@ -15,7 +15,7 @@ namespace TELEGA
         private ProductStandart(string product_name, string product_brand, string refinement)
         {
             Product_name = product_name;
-            Product_brand = Product_brand;
+            Product_brand = product_brand;
             Refinement = refinement;
         }
     }
