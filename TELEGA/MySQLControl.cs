@@ -247,6 +247,23 @@ namespace TELEGA
         }
 
 
+        public List<ProductStandart> GetProductsStandart(string command_text)
+        {
+            MySqlConnection my_connection = new MySqlConnection("Database=" + "ProductBaseStandart" + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
+            my_connection.Open(); //Устанавливаем соединение с базой данных.
+            MySqlDataReader MyDataReader = myCommand.ExecuteReader();
+            List<ProductStandart> product_standart = new List<ProductStandart>();
+            while (MyDataReader.Read())
+            {
+                product_standart.Add(new ProductStandart(MyDataReader.GetString(0), MyDataReader.GetString(2),
+                                                      MyDataReader.GetString(1)));
+            }
+            MyDataReader.Close();
+            my_connection.Close();
+            return product_standart;
+        }
+
         public string FNS_Login
         {
             get { return m_fns_login; }
