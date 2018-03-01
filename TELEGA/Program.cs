@@ -218,6 +218,7 @@ namespace Telegram.Bot.Examples.Echo
 /Telegraph - Вывести информацию в телеграф
 В случае ошибки писать https://t.me/joinchat/F7LnehCPgzY5b8sfHwN6KA";
 
+
                     await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
             }
