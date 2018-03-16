@@ -29,7 +29,7 @@ namespace TELEGA
                 return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, st.Store_name
                                          From CheckTelegram.products as pr, CheckTelegram.users as us, 
                                          CheckTelegram.store as st, CheckTelegram.`check` as ch
-                                         Where us.ID_users = st.ID_users and st.Store_name = ch.Store_name and ch.ID_check = pr.ID_check
+                                         Where us.ID_users = ch.ID_Users and ch.ID_check = pr.ID_check
                                          and pr.Product_name LIKE '%" + name_product + "%'");
             }
             catch (MySqlException e)
@@ -44,7 +44,7 @@ namespace TELEGA
         {
             try
             {
-                return my_sql_control.GetProductsStandart("SELECT pr.ProductName, pr.BrandName, pr.Refinement FROM ProductBaseStandart.Products As pr;");
+                return my_sql_control.GetProductsStandart("SELECT pr.ProductName, pr.BrandName, pr.Refinement FROM mydb.List_Products As pr;");
             }
             catch (MySqlException e)
             {

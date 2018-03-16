@@ -17,7 +17,7 @@ namespace TELEGA
             m_user_id = "Master";
             m_password = "Telegram";
             m_database = "CheckTelegram";
-            m_host = "mybasetelegram.cswjqwlmeojz.us-west-2.rds.amazonaws.com";
+            m_host = "mydbtelegramcheck.cswjqwlmeojz.us-west-2.rds.amazonaws.com";
         }
         /// <summary>
         /// Добавление нового пользователя в БД
@@ -63,12 +63,14 @@ namespace TELEGA
         /// </summary>
         /// <param name="store_name"></param>
         /// <param name="id_user"></param>
-        public void AddStore(string store_name, int id_user)
+        public void AddStore(string store_name, int id_user, string inn)
         {
+            int count = MaxStore();
+            count++;
             string store_name_new = store_name.Replace("'", " ").Trim();
             try
             {
-                MySQL_Insert("INSERT INTO CheckTelegram.store (Store_name, ID_users) VALUES ('" + store_name_new + "', '" + id_user + "');");
+                MySQL_Insert("INSERT INTO CheckTelegram.store (ID_Store, Store_name, Address, INN) VALUES ('" + count + "','" + store_name + "', '" + id_user + "', '" + inn + "');");
             } catch { }
         }
         /// <summary>
@@ -78,15 +80,20 @@ namespace TELEGA
         /// <param name="store_name"></param>
         /// <param name="address"></param>
         /// <param name="date_time"></param>
-        public void AddCheck(int id_check, string store_name, string address, string date_time, Check check)
+        public void AddCheck(int id_check, int id_users, string store_name, string address, string date_time, Check check)
         {
-            string store_name_new = store_name.Replace("'", " ").Trim();
+           // string store_name_new = check.Document.Receipt.User.Replace("'", " ").Trim();
             try
             {
-                MySQL_Insert(@"INSERT INTO CheckTelegram.check (ID_check, Store_name, Address, DateTime) 
-                VALUES ('" + id_check + "', '" + store_name_new + "', '" + address + "', '" + date_time + "');");
+                MySQL_Insert(@"INSERT INTO CheckTelegram.check (ID_check, ID_Users, Store_Name, Address, DateTime, Operator, CheckNumber, SumTotal, SumTotalNds, RN_KKT, NDS18, INN, FD, FP, FN) 
+                VALUES ('" + check.Document.Receipt.RequestNumber + "', '" + id_users + "' ,'"
+                          + check.Document.Receipt.User + "', '" + check.Document.Receipt.RetailPlaceAddress + "', '" 
+                          + check.Document.Receipt.DateTime + "', '"+ check.Document.Receipt.Operator +"', '"+check.Document.Receipt.RequestNumber +"', '"+ check.Document.Receipt.TotalSum +"', '"
+                          + check.Document.Receipt.Nds10 +"', '"+ check.Document.Receipt.KktRegId +"', '"
+                          + check.Document.Receipt.Nds18 + "', '"+check.Document.Receipt.UserInn+"' , '" + check.Document.Receipt.FiscalDocumentNumber + "', '" 
+                          + check.Document.Receipt.FiscalSign + "', '" + check.Document.Receipt.FiscalDriveNumber + "');");
                 
-                AddProduct(check);
+               AddProduct(check);
             } catch { }
         }
         /// <summary>
@@ -99,12 +106,15 @@ namespace TELEGA
             foreach (var item in check.Document.Receipt.Items)
             {
                 double sum = Convert.ToDouble(item.Sum) / 100;
+                double price = Convert.ToDouble(item.Price) / 100;
+                double nds10 = Convert.ToDouble(item.Nds10) / 100;
+                double nds18 = Convert.ToDouble(item.Nds18) / 100;
                // int random = new Random(DateTime.Now.Millisecond).Next(1000);
                 
                 try
                 {
-                    MySQL_Insert(@"INSERT INTO CheckTelegram.products (ID, ID_check, Product_name, Product_sum, Product_quantity) 
-                    VALUES ('" + count + "', '" + check.Document.Receipt.ShiftNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "');");
+                    MySQL_Insert(@"INSERT INTO CheckTelegram.products (ID, ID_check, Product_name, Product_sum, Product_quantity, Product_NDS, Product_NDS18, Product_Price) 
+                    VALUES ('" + count + "', '" + check.Document.Receipt.RequestNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "', '" + nds10 + "', '" + nds18 + "', '" + price + "');");
                     count++;
                 } catch { }
                
@@ -131,6 +141,18 @@ namespace TELEGA
                 return MySQL_Max(@"SELECT Max(pr.ID) FROM CheckTelegram.products As pr");
             }
             catch 
+            {
+                return 0;
+            }
+        }
+
+        public int MaxStore()
+        {
+            try
+            {
+                return MySQL_Max(@"SELECT Max(pr.ID) FROM CheckTelegram.store As pr");
+            }
+            catch (Exception e)
             {
                 return 0;
             }
@@ -249,7 +271,7 @@ namespace TELEGA
 
         public List<ProductStandart> GetProductsStandart(string command_text)
         {
-            MySqlConnection my_connection = new MySqlConnection("Database=" + "ProductBaseStandart" + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
+            MySqlConnection my_connection = new MySqlConnection("Database=" + "mydb" + ";Data Source=" + m_host + ";User Id=" + m_user_id + ";Password=" + m_password + ";CharSet=utf8;");
             MySqlCommand myCommand = new MySqlCommand(command_text, my_connection);
             my_connection.Open(); //Устанавливаем соединение с базой данных.
             MySqlDataReader MyDataReader = myCommand.ExecuteReader();
