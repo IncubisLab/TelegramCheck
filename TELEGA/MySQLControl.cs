@@ -63,14 +63,14 @@ namespace TELEGA
         /// </summary>
         /// <param name="store_name"></param>
         /// <param name="id_user"></param>
-        public void AddStore(string store_name, int id_user, string inn)
+        public void AddStore(string store_name, string address, string inn)
         {
-            int count = MaxStore();
-            count++;
-            string store_name_new = store_name.Replace("'", " ").Trim();
+            
+            //string store_name_new = store_name.Replace("'", " ").Trim();
+           // string inn_new = inn.Replace("\"", " ").Trim();
             try
             {
-                MySQL_Insert("INSERT INTO CheckTelegram.store (ID_Store, Store_name, Address, INN) VALUES ('" + count + "','" + store_name + "', '" + id_user + "', '" + inn + "');");
+                MySQL_Insert("INSERT INTO CheckTelegram.store (INN, Store_name, Address) VALUES ('" + Convert.ToInt64(inn) + "','" + store_name + "', '" + address + "');");
             } catch { }
         }
         /// <summary>
@@ -80,17 +80,17 @@ namespace TELEGA
         /// <param name="store_name"></param>
         /// <param name="address"></param>
         /// <param name="date_time"></param>
-        public void AddCheck(int id_check, int id_users, string store_name, string address, string date_time, Check check)
+        public void AddCheck(int id_users, Check check)
         {
            // string store_name_new = check.Document.Receipt.User.Replace("'", " ").Trim();
             try
             {
-                MySQL_Insert(@"INSERT INTO CheckTelegram.check (ID_check, ID_Users, Store_Name, Address, DateTime, Operator, CheckNumber, SumTotal, SumTotalNds, RN_KKT, NDS18, INN, FD, FP, FN) 
+                MySQL_Insert(@"INSERT INTO CheckTelegram.check (ID_check, ID_Users, Store_Name, Address, DateTime, Operator, CheckNumber, SumTotal, SumTotalNds, RN_KKT, NDS18, INN_Store, FD, FP, FN) 
                 VALUES ('" + check.Document.Receipt.RequestNumber + "', '" + id_users + "' ,'"
                           + check.Document.Receipt.User + "', '" + check.Document.Receipt.RetailPlaceAddress + "', '" 
-                          + check.Document.Receipt.DateTime + "', '"+ check.Document.Receipt.Operator +"', '"+check.Document.Receipt.RequestNumber +"', '"+ check.Document.Receipt.TotalSum +"', '"
-                          + check.Document.Receipt.Nds10 +"', '"+ check.Document.Receipt.KktRegId +"', '"
-                          + check.Document.Receipt.Nds18 + "', '"+check.Document.Receipt.UserInn+"' , '" + check.Document.Receipt.FiscalDocumentNumber + "', '" 
+                          + check.Document.Receipt.DateTime + "', '"+ check.Document.Receipt.Operator +"', '"+check.Document.Receipt.RequestNumber +"', '"+ check.Document.Receipt.TotalSum/100 +"', '"
+                          + check.Document.Receipt.Nds10/100 +"', '"+ check.Document.Receipt.KktRegId +"', '"
+                          + check.Document.Receipt.Nds18/100 + "', '"+ Convert.ToInt64(check.Document.Receipt.UserInn)+"' , '" + check.Document.Receipt.FiscalDocumentNumber + "', '" 
                           + check.Document.Receipt.FiscalSign + "', '" + check.Document.Receipt.FiscalDriveNumber + "');");
                 
                AddProduct(check);
@@ -102,7 +102,7 @@ namespace TELEGA
         /// <param name="check"></param>
         public void AddProduct(Check check)
         {
-            int count = MaxProducts();
+           // int count = MaxProducts();
             foreach (var item in check.Document.Receipt.Items)
             {
                 double sum = Convert.ToDouble(item.Sum) / 100;
@@ -113,9 +113,9 @@ namespace TELEGA
                 
                 try
                 {
-                    MySQL_Insert(@"INSERT INTO CheckTelegram.products (ID, ID_check, Product_name, Product_sum, Product_quantity, Product_NDS, Product_NDS18, Product_Price) 
-                    VALUES ('" + count + "', '" + check.Document.Receipt.RequestNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "', '" + nds10 + "', '" + nds18 + "', '" + price + "');");
-                    count++;
+                    MySQL_Insert(@"INSERT INTO CheckTelegram.products (ID_check, Product_name, Product_sum, Product_quantity, Product_NDS, Product_NDS18, Product_Price) 
+                    VALUES ('" + check.Document.Receipt.RequestNumber + "', '" + item.Name + "', '" + sum + "', '" + item.Quantity + "', '" + nds10 + "', '" + nds18 + "', '" + price + "');");
+
                 } catch { }
                
             }
@@ -141,18 +141,6 @@ namespace TELEGA
                 return MySQL_Max(@"SELECT Max(pr.ID) FROM CheckTelegram.products As pr");
             }
             catch 
-            {
-                return 0;
-            }
-        }
-
-        public int MaxStore()
-        {
-            try
-            {
-                return MySQL_Max(@"SELECT Max(pr.ID) FROM CheckTelegram.store As pr");
-            }
-            catch (Exception e)
             {
                 return 0;
             }

@@ -63,21 +63,6 @@ namespace TELEGA
               returnContent: true
             );
         }
-
-        public void AddListNodeElement(List<CheckProduct> products)
-        {
-            foreach(var product in products)
-            {
-                m_node_element.Add(
-                    new NodeElement("ol", null,
-                       new NodeElement("b", null, "Продукт: "),
-                       new NodeElement("li", null, product.Product_Name, new NodeElement("b", null, " Сумма: "),
-                       new NodeElement("text", null, product.Product_Sum + "руб."),
-                       new NodeElement("b", null, " Магазин: "),
-                       new NodeElement("text", null, product.Store_Name))
-                       ));
-            }
-        }
         public void AddListNodeElementNew(List<CheckProduct> products)
         {
             List<NodeElement> elem = new List<NodeElement>();
@@ -91,7 +76,7 @@ namespace TELEGA
             }
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
         }
-        public void AddListNodeElem(List<CheckProduct> products, Data_Analysis data_analysis)
+        public void AddListNodeElementNew2(List<CheckProduct> products)
         {
             List<NodeElement> elem = new List<NodeElement>();
 
@@ -99,8 +84,8 @@ namespace TELEGA
             {
                 elem.Add(new NodeElement("b", null, "Продукт: "));
                 elem.Add(new NodeElement("li", null, product.Product_Name, new NodeElement("b", null, " Сумма: "),
-                         new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
-                         new NodeElement("text", null, product.Store_Name)));
+                    new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
+                    new NodeElement("text", null, product.Store_Name)));
             }
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
         }
@@ -110,7 +95,7 @@ namespace TELEGA
         /// <param name="product"></param>
         public async void EditPage(string product)
         {
-            Page editedPage = await m_tokenClient.EditPageAsync(
+            await m_tokenClient.EditPageAsync(
             // "Sample-Page1-02-03-2",
             "Sample-Page-02-03-16",
              "Сравнение цен о продукте " + product,

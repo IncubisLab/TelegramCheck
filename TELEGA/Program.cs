@@ -50,8 +50,8 @@ namespace Telegram.Bot.Examples.Echo
         {
             my_sql_control.AccountFNS((int)message.Chat.Id);
 
-           // Checking checking = new Checking(my_sql_control.FNS_Login, my_sql_control.FNS_Password);
-            Checking checking = new Checking("+79817889931", "405381");
+            Checking checking = new Checking(my_sql_control.FNS_Login, my_sql_control.FNS_Password);
+           // Checking checking = new Checking("+79817889931", "405381");
             CheckInfo checkInfo = new CheckInfo
             {
                 FN = RegularExpressions(input, "fn=(\\d+)"),
@@ -87,13 +87,11 @@ namespace Telegram.Bot.Examples.Echo
                 Console.WriteLine("Ошибка объекта");
             }
 
-            Console.WriteLine("Чек номер {0}", check.Document.Receipt.ShiftNumber);
+            Console.WriteLine("Чек номер {0}", check.Document.Receipt.RequestNumber);
             Thread.Sleep(10);
-            my_sql_control.AddStore(check.Document.Receipt.User, (int)message.Chat.Id, check.Document.Receipt.UserInn);
+            my_sql_control.AddStore(check.Document.Receipt.User, check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.UserInn);
             Thread.Sleep(10);
-            my_sql_control.AddCheck(check.Document.Receipt.ShiftNumber,(int)message.Chat.Id, check.Document.Receipt.User, 
-                                    check.Document.Receipt.RetailPlaceAddress, check.Document.Receipt.DateTime, check);
-           // Thread.Sleep(100); // пауза для закрытия БД
+            my_sql_control.AddCheck((int)message.Chat.Id, check);
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
             TelegraphAPI control_telegraph = new TelegraphAPI();
             List<CheckProduct> products = data_analysis.Search_Product(check);
@@ -233,12 +231,9 @@ namespace Telegram.Bot.Examples.Echo
         private static async void ParserAuthorization(Message message)
         {
             string login = "+" + RegularExpressions(message.Text, "login:(\\d+)");
-            //await Bot.SendTextMessageAsync(message.Chat.Id, "Ваш логин:" + login);
             string password = RegularExpressions(message.Text, "password:(\\d+)");
-          //  await Bot.SendTextMessageAsync(message.Chat.Id, "Ваш пароль:" + password);
             my_sql_control.AddUsers((int)message.Chat.Id, message.Chat.FirstName, message.Chat.LastName, message.Chat.Username, login, password);
             await Bot.SendTextMessageAsync(message.Chat.Id, "Данные записаны!");
-         //   my_sql_control.UpdateUsers(login, password, (int)message.Chat.Id);
         }
         private static async void BotOnCallbackQuery(object sender, CallbackQueryEventArgs ev)
         {
@@ -246,7 +241,7 @@ namespace Telegram.Bot.Examples.Echo
             if (ev.CallbackQuery.Data == "Регистрация")
             {
                 await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Зарегестрируйтесь в системе ФНС", false);
-                var keyboard = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+                var keyboard = new ReplyKeyboardMarkup
                 {
                     Keyboard = new[] {
                                         new[] // row 1
@@ -278,9 +273,5 @@ namespace Telegram.Bot.Examples.Echo
             Match match = regex.Match(input);
             return match.Groups[1].Value;
         }
-
-       
-
-
     }
 }
