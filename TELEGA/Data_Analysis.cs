@@ -10,6 +10,7 @@ namespace TELEGA
     class Data_Analysis
     {
         private MySQLControl my_sql_control;
+        private ListReportCheck m_list_report_check = new ListReportCheck();
         public Data_Analysis(MySQLControl my_sql_control)
         {
             this.my_sql_control = my_sql_control;
@@ -23,10 +24,18 @@ namespace TELEGA
         {
             try
             {
-                return my_sql_control.ResultCheck( @"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, ch.Store_name
-                                                     From CheckTelegram.products as pr, CheckTelegram.users as us, CheckTelegram.`check` as ch
-                                                     Where us.ID_users = ch.ID_Users and ch.ID_check = pr.ID_check
-                                                     and pr.Product_name LIKE '%" + name_product + "%'");
+//                return my_sql_control.ResultCheck( @"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, ch.Store_name
+//                                                     From CheckTelegram.products as pr, CheckTelegram.users as us, CheckTelegram.`check` as ch
+//                                                     Where us.ID_users = ch.ID_Users and ch.ID_check = pr.ID_check
+//                                                     and pr.Product_name LIKE '%" + name_product + "%'");
+                return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, lt.Store_name
+                From CheckTelegram.products as pr, CheckTelegram.`check` as ch, CheckTelegram.store as st, mydb.List_Store as lt
+                Where ch.ID_check = pr.ID_check and st.INN = ch.INN_Store and st.Link_store = lt.ID
+                and pr.Product_name LIKE '%" + name_product + "%'" +
+                @"union
+                Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, ch.Store_name
+                From CheckTelegram.products as pr, CheckTelegram.check as ch
+                Where ch.ID_check = pr.ID_check and pr.Product_name LIKE '%" + name_product + "%'");
             }
             catch (MySqlException e)
             {
@@ -74,6 +83,7 @@ namespace TELEGA
                     if (e.Count >= 1)
                     {
                         List<CheckProduct> pr = Parser_Check(e.Product);
+                        m_list_report_check.AddReportCheck(e.Product, product_name, pr);
                         if (pr == null) { Console.WriteLine("Достигнуто Max подключений!"); return null; }
                         products.AddRange(pr);
                     }
@@ -93,6 +103,12 @@ namespace TELEGA
             }
             return products;
         }
+
+        public ListReportCheck LReportCheck
+        {
+            get { return m_list_report_check; }
+        }
+
 
         // TODO: Добавить метод для парсинга чека (номер чека, продукт)
         // TODO: Запомнить список продуктов 

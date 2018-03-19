@@ -63,6 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CheckProduct.cs" />
+    <Compile Include="ListReportCheck.cs" />
+    <Compile Include="ReportCheck.cs" />
     <Compile Include="ControlBot.cs" />
     <Compile Include="Data_Analysis.cs" />
     <Compile Include="MySQLControl.cs" />

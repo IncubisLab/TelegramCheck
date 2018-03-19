@@ -76,18 +76,51 @@ namespace TELEGA
             }
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
         }
-        public void AddListNodeElementNew2(List<CheckProduct> products)
+        public void AddListNodeElementNew2(ListReportCheck reportCheck)
         {
             List<NodeElement> elem = new List<NodeElement>();
-
-            foreach (var product in products)
+            List<NodeElement> elem1 = new List<NodeElement>();
+            foreach (var report in  reportCheck.ReportCh)
             {
-                elem.Add(new NodeElement("b", null, "Продукт: "));
-                elem.Add(new NodeElement("li", null, product.Product_Name, new NodeElement("b", null, " Сумма: "),
-                    new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
-                    new NodeElement("text", null, product.Store_Name)));
-            }
-            m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
+               // elem.Add(new NodeElement("b",null, report.m_product_check_name));
+               elem.Add(new NodeElement("ul",null, new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()))));new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()));
+                
+                foreach (var product in report.m_check_product)
+                {
+                   
+                    elem1.Add(new NodeElement("li", null, new NodeElement("b", null, "Продукт: "+product.Product_Name), new NodeElement("b", null, " Сумма: "),
+                        new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
+                        new NodeElement("text", null, product.Store_Name)));
+                }
+               // elem.Add(new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper())));
+               // elem.Add(new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()), new NodeElement("ol", null,"s")));
+                elem.Add(new NodeElement("ol", null, elem1.ToArray()));
+                elem1.Clear();
+            }           
+
+
+
+
+            //foreach (var product in products)
+            //{
+            //    elem.Add(new NodeElement("b", null, "Продукт: "));
+            //    elem.Add(new NodeElement("li", null, product.Product_Name, new NodeElement("b", null, " Сумма: "),
+            //        new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
+            //        new NodeElement("text", null, product.Store_Name)));
+            //}
+            //foreach (var el in elem1)
+            //{
+            //    m_node_element.Add(new NodeElement("ul", null, el));
+            //    foreach (var em in elem)
+            //    {
+                  
+            //        m_node_element.Add(new NodeElement("ol", null, em));
+            //    }
+            //}
+           // m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
+                //, new NodeElement("ol", null, elem.ToArray()));
+            //m_node_element.Add(new NodeElement("ul", null, elem.ToArray()));
+            m_node_element = elem;
         }
         /// <summary>
         /// Изменение существующей страницы

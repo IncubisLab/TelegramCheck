@@ -102,7 +102,7 @@ namespace Telegram.Bot.Examples.Echo
             }
             if (products.Count > 0)
             {
-                control_telegraph.AddListNodeElementNew(products);
+                control_telegraph.AddListNodeElementNew2(data_analysis.LReportCheck);
                 control_telegraph.EditPage("по чеку");
                 await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
             }
