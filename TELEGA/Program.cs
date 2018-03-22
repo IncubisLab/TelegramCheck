@@ -296,11 +296,11 @@ namespace Telegram.Bot.Examples.Echo
             }
             if (ev.CallbackQuery.Data == "Отправить текст QR -кода!")
             {
-                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "/Telegraph \"название продукта!\"");
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "/info \"QR-код\"");
             }
             if (ev.CallbackQuery.Data == "Получить инфо о продукте!")
             {
-                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "/info \"QR-код\"");
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "/Telegraph \"название продукта!\"");
             }
         }
         private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
