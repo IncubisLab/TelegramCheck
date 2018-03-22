@@ -99,6 +99,7 @@ namespace TELEGA
             m_node_element.Add(new NodeElement("b", null, "Адрес: " + check.Document.Receipt.RetailPlaceAddress));
             m_node_element.Add(new NodeElement("br", null));
             m_node_element.Add(new NodeElement("b", null, "Опрератор: "+check.Document.Receipt.Operator));
+            m_node_element.Add(new NodeElement("br", null));
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
             m_node_element.Add(new NodeElement("b", null, "НДС 10%: " + (Convert.ToDouble(check.Document.Receipt.Nds10)/100) + " руб."));
             m_node_element.Add(new NodeElement("b", null, "   ИТОГО: " + (Convert.ToDouble(check.Document.Receipt.TotalSum) / 100) + " руб."));
@@ -196,6 +197,7 @@ namespace TELEGA
             {
                 Console.WriteLine(page.Url);
             }
+            Console.WriteLine("Количестово страниц: {0}",response.TotalCount);
         }
         public string GetPageList1()
         {

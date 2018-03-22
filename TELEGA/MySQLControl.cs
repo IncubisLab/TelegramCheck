@@ -73,6 +73,15 @@ namespace TELEGA
                 MySQL_Insert("INSERT INTO CheckTelegram.store (INN, Store_name, Address) VALUES ('" + Convert.ToInt64(inn) + "','" + store_name + "', '" + address + "');");
             } catch { }
         }
+
+        public void AddKeyProduct(string product_name)
+        {
+            try
+            {
+                MySQL_Insert("INSERT INTO `mydb`.`List_Products` (`ProductName`) VALUES ('"+product_name+"');");
+            }
+            catch { }
+        }
         /// <summary>
         /// Добавление нового чека в БД
         /// </summary>

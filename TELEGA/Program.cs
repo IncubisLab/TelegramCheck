@@ -115,7 +115,7 @@ namespace Telegram.Bot.Examples.Echo
             {
                 control_telegraph.AddListNodeElementNew2(data_analysis.LReportCheck);
                // control_telegraph.EditPage("по чеку №"+ check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
-                control_telegraph.CreatePage1("Сравнение цен о продукте по чеку №" + check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
+                control_telegraph.CreatePage1("Сравнение цен о продуктах по чеку №" + check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
                 //await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
                 Thread.Sleep(700);
                 await Bot.SendTextMessageAsync(message.Chat.Id, control_telegraph.GetPageList1());
@@ -124,6 +124,8 @@ namespace Telegram.Bot.Examples.Echo
             {
                 await Bot.SendTextMessageAsync(message.Chat.Id, "Данного продукта нет в БД");
             }
+
+            await Bot.SendTextMessageAsync(message.Chat.Id, "Продукт не распознался?! \nДобавь ключевое слово продукта!\n/keyproduct \"название продукта\"");
         }
         private static async void BotOnPhotoMassage(Message message)
         {
@@ -224,6 +226,11 @@ namespace Telegram.Bot.Examples.Echo
                         ParserAuthorization(message);
                         break;
                     }
+                case "/keyproduct":
+                    {
+                        AddKeyProduct(message);
+                        break;
+                    }
                 case "/reg":
                     {
                         Checking chek = new Checking();
@@ -231,16 +238,29 @@ namespace Telegram.Bot.Examples.Echo
                         break;
                     }
                 default:
-                    const string usage = @"Использование:
-/info   - Информация о продукте
-/Product - Инфо по продукту
-/Telegraph - Вывести информацию в телеграф
-В случае ошибки писать https://t.me/joinchat/F7LnehCPgzY5b8sfHwN6KA";
-
-
-                    await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
+//                    const string usage = @"Использование:
+///info   - Информация о продукте
+///Product - Инфо по продукту
+///Telegraph - Вывести информацию в телеграф
+//В случае ошибки писать https://t.me/joinchat/F7LnehCPgzY5b8sfHwN6KA";
+                    var keyboard1 = new InlineKeyboardMarkup(new[] {
+                            new []
+                            {
+                                InlineKeyboardButton.WithCallbackData("Отправить текст QR -кода!"),
+                                InlineKeyboardButton.WithCallbackData("Получить инфо о продукте!"),
+                            }
+                         });
+                    await Bot.SendTextMessageAsync(message.Chat.Id, "Отправте фото с QR -кодом и получите сравнение цен о продуктах или выбирите ниже!", ParseMode.Default, false, false, 0, keyboard1);
+                  //  await Bot.SendTextMessageAsync(message.Chat.Id,usage, replyMarkup: new ReplyKeyboardRemove());
                     break;
             }
+        }
+        private static async void AddKeyProduct(Message message)
+        {
+            //string key_product = RegularExpressions(message.Text, "k:(\\d+)");
+            string product = message.Text.Remove(0, message.Text.IndexOf(' ') + 1);
+            await Bot.SendTextMessageAsync(message.Chat.Id, "Продукт: "+ product+ " записан!");
+            my_sql_control.AddKeyProduct(product);
         }
         private static async void ParserAuthorization(Message message)
         {
@@ -254,24 +274,33 @@ namespace Telegram.Bot.Examples.Echo
             var message_ev = ev.CallbackQuery.Message;
             if (ev.CallbackQuery.Data == "Регистрация")
             {
-                await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Зарегестрируйтесь в системе ФНС", false);
-                var keyboard = new ReplyKeyboardMarkup
-                {
-                    Keyboard = new[] {
-                                        new[] // row 1
-                                               {
-                                                   new KeyboardButton("Телефон") { RequestContact = true }
-                                               },
-                                            },
-                    ResizeKeyboard = true
-                };
-                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите номер телефона", ParseMode.Default, false, false, 0, keyboard);
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "К сожалению пока нет технической возможности используйте приложение ФНС для регистраци!!!");
+                //await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Зарегестрируйтесь в системе ФНС", false);
+                //var keyboard = new ReplyKeyboardMarkup
+                //{
+                //    Keyboard = new[] {
+                //                        new[] // row 1
+                //                               {
+                //                                   new KeyboardButton("Телефон") { RequestContact = true }
+                //                               },
+                //                            },
+                //    ResizeKeyboard = true
+                //};
+                //await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите номер телефона", ParseMode.Default, false, false, 0, keyboard);
             }
             if (ev.CallbackQuery.Data == "Авторизация")
             {
                 await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Авторизуйтесь в системе ФНС", false);
                 await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите логин и пароль для авторизации как напримрие!");
-                await Bot.SendTextMessageAsync(message_ev.Chat.Id, string.Format("/authorization {0}login:andrey {0}password:xxxxx", Environment.NewLine));
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, string.Format("/authorization {0}login:79817889931 {0}password:xxxxx", Environment.NewLine));
+            }
+            if (ev.CallbackQuery.Data == "Отправить текст QR -кода!")
+            {
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "/Telegraph \"название продукта!\"");
+            }
+            if (ev.CallbackQuery.Data == "Получить инфо о продукте!")
+            {
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "/info \"QR-код\"");
             }
         }
         private static void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
