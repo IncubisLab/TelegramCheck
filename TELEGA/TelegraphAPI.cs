@@ -63,6 +63,14 @@ namespace TELEGA
               returnContent: true
             );
         }
+        public async void CreatePage1(string number_check)
+        {
+            Page newPage = await m_tokenClient.CreatePageAsync(
+              number_check,
+             
+             content: m_node_element.ToArray(), returnContent: true
+             );
+        }
         public void AddListNodeElementNew(List<CheckProduct> products)
         {
             List<NodeElement> elem = new List<NodeElement>();
@@ -80,22 +88,33 @@ namespace TELEGA
         {
             List<NodeElement> elem = new List<NodeElement>();
             List<NodeElement> elem1 = new List<NodeElement>();
+            int count = 0;
             foreach (var report in  reportCheck.ReportCh)
             {
-               // elem.Add(new NodeElement("b",null, report.m_product_check_name));
+              
                elem.Add(new NodeElement("ul",null, new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()))));new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()));
-                
+               // elem.Add(new NodeElement("b",null, report.m_product_check_name +" Цена: " + report.m_price));
+                elem.Add(new NodeElement("b", null, report.m_product_check_name));
+                elem.Add(new NodeElement("br", null));
+                elem.Add(new NodeElement("b", null, "Цена: " +( Convert.ToDouble(report.m_price)/100)));
                 foreach (var product in report.m_check_product)
                 {
-                   
-                    elem1.Add(new NodeElement("li", null, new NodeElement("b", null, "Продукт: "+product.Product_Name), new NodeElement("b", null, " Сумма: "),
-                        new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
-                        new NodeElement("text", null, product.Store_Name)));
+                    if (count < 5)
+                    {
+                        elem1.Add(new NodeElement("li", null, new NodeElement("b", null, "Продукт: " + product.Product_Name), new NodeElement("b", null, " Сумма: "),
+                            new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
+                            new NodeElement("text", null, product.Store_Name)));
+                    }else
+                    {
+                        break;
+                    }
+                    count++;
                 }
                // elem.Add(new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper())));
                // elem.Add(new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()), new NodeElement("ol", null,"s")));
                 elem.Add(new NodeElement("ol", null, elem1.ToArray()));
                 elem1.Clear();
+                count = 0;
             }           
 
 
@@ -145,6 +164,18 @@ namespace TELEGA
             {
                 Console.WriteLine(page.Url);
             }
+        }
+        public string GetPageList1()
+        {
+            var response = m_tokenClient.GetPageListAsync(0, 40).Result;
+            string pageTelegraph;
+           
+            //foreach (var page in response.Pages)
+            //{
+            //   // pageTelegraph = page.
+            //}
+            return Convert.ToString(response.Pages[0].Url);
+
         }
         /// <summary>
         /// Установить лимит на количество страниц в аккаунте

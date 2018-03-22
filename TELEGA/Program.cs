@@ -64,6 +64,7 @@ namespace Telegram.Bot.Examples.Echo
             {
                 Thread.Sleep(100);
                var check1 = checking.GetCheck(checkInfo);
+               check = check1;
                 if (check1 == null)
                 {
                     await Bot.SendTextMessageAsync(message.Chat.Id, "Ответ сервера ФНС не получен!\nВозможно чек невалидный!");
@@ -103,8 +104,11 @@ namespace Telegram.Bot.Examples.Echo
             if (products.Count > 0)
             {
                 control_telegraph.AddListNodeElementNew2(data_analysis.LReportCheck);
-                control_telegraph.EditPage("по чеку");
+                control_telegraph.EditPage("по чеку №"+ check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
+                //control_telegraph.CreatePage1("Сравнение цен о продукте по чеку №" + check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
                 await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+               // Thread.Sleep(700);
+               // await Bot.SendTextMessageAsync(message.Chat.Id, control_telegraph.GetPageList1());
             }
             else
             {

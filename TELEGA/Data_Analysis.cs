@@ -61,7 +61,7 @@ namespace TELEGA
         /// Поиск ключевых слов продуктов
         /// </summary>
         /// <param name="product_name"> Название продукта в исходном виде </param>
-        public List<CheckProduct> Search_Key_Product1(string product_name)
+        public List<CheckProduct> Search_Key_Product1(string product_name, ValueType price)
         {
             List<CheckProduct> products = new List<CheckProduct>();
            // var keywords = StandartProduct();
@@ -83,7 +83,7 @@ namespace TELEGA
                     if (e.Count >= 1)
                     {
                         List<CheckProduct> pr = Parser_Check(e.Product);
-                        m_list_report_check.AddReportCheck(e.Product, product_name, pr);
+                        m_list_report_check.AddReportCheck(e.Product, product_name, Convert.ToString(price), pr);
                         if (pr == null) { Console.WriteLine("Достигнуто Max подключений!"); return null; }
                         products.AddRange(pr);
                     }
@@ -97,7 +97,7 @@ namespace TELEGA
             List<CheckProduct> products = new List<CheckProduct>();
             foreach (var item in check.Document.Receipt.Items)
             {
-                List<CheckProduct> pr = Search_Key_Product1(item.Name);
+                List<CheckProduct> pr = Search_Key_Product1(item.Name, item.Price);
                 if (pr == null) { Console.WriteLine("Достигнуто Max подключений!"); return null; }
                 products.AddRange(pr);
             }

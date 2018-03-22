@@ -53,6 +53,7 @@ namespace TELEGA
                     {
                         TelegraphAPI telegraphAPI = new TelegraphAPI();
                         telegraphAPI.GetPageList();
+                      // Console.WriteLine(telegraphAPI.GetPageList1());
                         break;
                     }
                 case "Max":
