@@ -48,6 +48,7 @@ namespace Telegram.Bot.Examples.Echo
         }
         private static async void ParserQR_Code(string input, Message message)
         {
+            TelegraphAPI control_telegraph = new TelegraphAPI();
             my_sql_control.AccountFNS((int)message.Chat.Id);
 
             Checking checking = new Checking(my_sql_control.FNS_Login, my_sql_control.FNS_Password);
@@ -62,7 +63,7 @@ namespace Telegram.Bot.Examples.Echo
             var check = checking.GetCheck(checkInfo);
             if (check == null)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                var check1 = checking.GetCheck(checkInfo);
                check = check1;
                 if (check1 == null)
@@ -75,13 +76,22 @@ namespace Telegram.Bot.Examples.Echo
             StringBuilder str = new StringBuilder("");
             try
             {
-                foreach (var item in check.Document.Receipt.Items)
-                {
-                    double sum = Convert.ToDouble(item.Sum) / 100;
-                    str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
-                }
-
-                await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
+               
+                //foreach (var item in check.Document.Receipt.Items)
+                //{
+                //    double sum = Convert.ToDouble(item.Sum) / 100;
+                //    str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
+                //}
+                control_telegraph.PrintCheck(check);
+                control_telegraph.CreatePage1("Чек №" + check.Document.Receipt.RequestNumber);
+                //control_telegraph.EditPage1("Чек №" + check.Document.Receipt.RequestNumber);
+                Thread.Sleep(700);
+                await Bot.SendTextMessageAsync(message.Chat.Id, "Ваш чек!");
+                  //await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//CHek-150-03-22");
+                 
+                await Bot.SendTextMessageAsync(message.Chat.Id, control_telegraph.GetPageList1());
+               // await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
+                 await Bot.SendTextMessageAsync(message.Chat.Id, "Ожидайте результата сравнения цен!");
             }
             catch
             {
@@ -94,7 +104,7 @@ namespace Telegram.Bot.Examples.Echo
             Thread.Sleep(10);
             my_sql_control.AddCheck((int)message.Chat.Id, check);
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-            TelegraphAPI control_telegraph = new TelegraphAPI();
+           // TelegraphAPI control_telegraph = new TelegraphAPI();
             List<CheckProduct> products = data_analysis.Search_Product(check);
             if (products == null) 
             {
@@ -104,11 +114,11 @@ namespace Telegram.Bot.Examples.Echo
             if (products.Count > 0)
             {
                 control_telegraph.AddListNodeElementNew2(data_analysis.LReportCheck);
-                control_telegraph.EditPage("по чеку №"+ check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
-                //control_telegraph.CreatePage1("Сравнение цен о продукте по чеку №" + check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
-                await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
-               // Thread.Sleep(700);
-               // await Bot.SendTextMessageAsync(message.Chat.Id, control_telegraph.GetPageList1());
+               // control_telegraph.EditPage("по чеку №"+ check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
+                control_telegraph.CreatePage1("Сравнение цен о продукте по чеку №" + check.Document.Receipt.RequestNumber + " Магазин: " + check.Document.Receipt.User);
+                //await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//Sample-Page-02-03-16");
+                Thread.Sleep(700);
+                await Bot.SendTextMessageAsync(message.Chat.Id, control_telegraph.GetPageList1());
             }
             else
             {

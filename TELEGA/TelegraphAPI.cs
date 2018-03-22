@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Telegraph;
 using Telegraph.Net;
 using Telegraph.Net.Models;
+using FSNCheck.Data;
 
 namespace TELEGA
 {
@@ -84,19 +85,40 @@ namespace TELEGA
             }
             m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
         }
+        public void PrintCheck(Check check)
+        {
+            List<NodeElement> elem = new List<NodeElement>();
+            //elem.Add(new NodeElement("b", null, check.Document.Receipt.Operator));
+            foreach (var item in check.Document.Receipt.Items)
+            { 
+                elem.Add(new NodeElement("li", null, new NodeElement("b", null, item.Name), new NodeElement("br", null), new NodeElement("b", null, "Цена: "),
+                           new NodeElement("text", null, (Convert.ToDouble(item.Price)/100) + " руб.")));
+            }
+            m_node_element.Add(new NodeElement("b", null, "Магазин: " + check.Document.Receipt.User));
+            m_node_element.Add(new NodeElement("br", null));
+            m_node_element.Add(new NodeElement("b", null, "Адрес: " + check.Document.Receipt.RetailPlaceAddress));
+            m_node_element.Add(new NodeElement("br", null));
+            m_node_element.Add(new NodeElement("b", null, "Опрератор: "+check.Document.Receipt.Operator));
+            m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
+            m_node_element.Add(new NodeElement("b", null, "НДС 10%: " + (Convert.ToDouble(check.Document.Receipt.Nds10)/100) + " руб."));
+            m_node_element.Add(new NodeElement("b", null, "   ИТОГО: " + (Convert.ToDouble(check.Document.Receipt.TotalSum) / 100) + " руб."));
+            
+        }
         public void AddListNodeElementNew2(ListReportCheck reportCheck)
         {
+            m_node_element.Clear();
             List<NodeElement> elem = new List<NodeElement>();
             List<NodeElement> elem1 = new List<NodeElement>();
             int count = 0;
             foreach (var report in  reportCheck.ReportCh)
             {
-              
+                //elem.Add(new NodeElement("br", null));
                elem.Add(new NodeElement("ul",null, new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()))));new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()));
                // elem.Add(new NodeElement("b",null, report.m_product_check_name +" Цена: " + report.m_price));
                 elem.Add(new NodeElement("b", null, report.m_product_check_name));
                 elem.Add(new NodeElement("br", null));
                 elem.Add(new NodeElement("b", null, "Цена: " +( Convert.ToDouble(report.m_price)/100)));
+                elem.Add(new NodeElement("br", null));
                 foreach (var product in report.m_check_product)
                 {
                     if (count < 5)
@@ -150,7 +172,17 @@ namespace TELEGA
             await m_tokenClient.EditPageAsync(
             // "Sample-Page1-02-03-2",
             "Sample-Page-02-03-16",
-             "Сравнение цен о продукте " + product,
+             "Сравнение цен о продуктах " + product,
+             content: m_node_element.ToArray(), returnContent: true
+             );
+        }
+
+        public async void EditPage1(string number)
+        {
+            await m_tokenClient.EditPageAsync(
+                // "Sample-Page1-02-03-2",
+            "CHek-150-03-22",
+             number,
              content: m_node_element.ToArray(), returnContent: true
              );
         }
@@ -168,7 +200,7 @@ namespace TELEGA
         public string GetPageList1()
         {
             var response = m_tokenClient.GetPageListAsync(0, 40).Result;
-            string pageTelegraph;
+           
            
             //foreach (var page in response.Pages)
             //{
