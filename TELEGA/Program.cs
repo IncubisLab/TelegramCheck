@@ -20,7 +20,8 @@ namespace Telegram.Bot.Examples.Echo
     public static class Program
     {
         //private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
-        private static readonly TelegramBotClient Bot = new TelegramBotClient("546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI");
+      //  private static readonly TelegramBotClient Bot = new TelegramBotClient("546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI");
+        private static readonly TelegramBotClient Bot = new TelegramBotClient("514039168:AAHZEBIQS9d50PyxSrv53892N_X_tB_ShJA");
         private static MySQLControl my_sql_control = new MySQLControl();
         private static ControlBot controlBot = new ControlBot();
         public static void Main(string[] args)
@@ -137,7 +138,9 @@ namespace Telegram.Bot.Examples.Echo
                 image.Save(test.FilePath);
 
               //  string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",file_name);
-                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI/{0}", file_name);
+                //string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI/{0}", file_name);
+                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot514039168:AAHZEBIQS9d50PyxSrv53892N_X_tB_ShJA/{0}", file_name);
+                
                 string data = GET(get, "");
                 Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
               
