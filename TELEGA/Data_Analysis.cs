@@ -24,10 +24,6 @@ namespace TELEGA
         {
             try
             {
-//                return my_sql_control.ResultCheck( @"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, ch.Store_name
-//                                                     From CheckTelegram.products as pr, CheckTelegram.users as us, CheckTelegram.`check` as ch
-//                                                     Where us.ID_users = ch.ID_Users and ch.ID_check = pr.ID_check
-//                                                     and pr.Product_name LIKE '%" + name_product + "%'");
                 return my_sql_control.ResultCheck(@"Select DISTINCT pr.Product_name, pr.Product_quantity, pr.Product_sum, lt.Store_name
                 From CheckTelegram.products as pr, CheckTelegram.`check` as ch, CheckTelegram.store as st, mydb.List_Store as lt
                 Where ch.ID_check = pr.ID_check and st.INN = ch.INN_Store and st.Link_store = lt.ID

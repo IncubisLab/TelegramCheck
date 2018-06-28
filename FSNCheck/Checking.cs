@@ -33,11 +33,6 @@ namespace FSNCheck
             req.Headers.Add("Version: 2");
             req.Headers.Add("ClientVersion: 1.4.4.1");
             req.GetResponse();
-            //using (StreamReader stream = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
-            //{
-            //    outStr = stream.ReadToEnd();
-            //}
-            //Console.WriteLine(outStr);
         }
 
         private string GetAuthToken()

@@ -66,11 +66,23 @@ namespace TELEGA
         }
         public async void CreatePage1(string number_check)
         {
-            Page newPage = await m_tokenClient.CreatePageAsync(
-              number_check,
-             
-             content: m_node_element.ToArray(), returnContent: true
-             );
+            try
+            {
+                Page newPage = await m_tokenClient.CreatePageAsync(
+                  number_check,
+
+                 content: m_node_element.ToArray(), returnContent: true
+                 );
+            }
+            catch { 
+                Console.WriteLine("Ошибка! Error!!!");
+               //if (m_node_element.Count >= 80)
+               //{
+               //    m_node_element.RemoveAt(80);
+               //}
+               //CreatePage1(number_check);
+              
+            }
         }
         public void AddListNodeElementNew(List<CheckProduct> products)
         {
@@ -133,35 +145,11 @@ namespace TELEGA
                     }
                     count++;
                 }
-               // elem.Add(new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper())));
-               // elem.Add(new NodeElement("li", null, new NodeElement("b", null, report.m_product_name.ToUpper()), new NodeElement("ol", null,"s")));
+
                 elem.Add(new NodeElement("ol", null, elem1.ToArray()));
                 elem1.Clear();
                 count = 0;
             }           
-
-
-
-
-            //foreach (var product in products)
-            //{
-            //    elem.Add(new NodeElement("b", null, "Продукт: "));
-            //    elem.Add(new NodeElement("li", null, product.Product_Name, new NodeElement("b", null, " Сумма: "),
-            //        new NodeElement("text", null, product.Product_Sum + "руб."), new NodeElement("b", null, " Магазин: "),
-            //        new NodeElement("text", null, product.Store_Name)));
-            //}
-            //foreach (var el in elem1)
-            //{
-            //    m_node_element.Add(new NodeElement("ul", null, el));
-            //    foreach (var em in elem)
-            //    {
-                  
-            //        m_node_element.Add(new NodeElement("ol", null, em));
-            //    }
-            //}
-           // m_node_element.Add(new NodeElement("ol", null, elem.ToArray()));
-                //, new NodeElement("ol", null, elem.ToArray()));
-            //m_node_element.Add(new NodeElement("ul", null, elem.ToArray()));
             m_node_element = elem;
         }
         /// <summary>
@@ -202,12 +190,6 @@ namespace TELEGA
         public string GetPageList1()
         {
             var response = m_tokenClient.GetPageListAsync(0, 40).Result;
-           
-           
-            //foreach (var page in response.Pages)
-            //{
-            //   // pageTelegraph = page.
-            //}
             return Convert.ToString(response.Pages[0].Url);
 
         }

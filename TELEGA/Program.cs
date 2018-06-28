@@ -20,8 +20,15 @@ namespace Telegram.Bot.Examples.Echo
     public static class Program
     {
         //private static readonly TelegramBotClient Bot = new TelegramBotClient("513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs");
-      //  private static readonly TelegramBotClient Bot = new TelegramBotClient("546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI");
-        private static readonly TelegramBotClient Bot = new TelegramBotClient("514039168:AAHZEBIQS9d50PyxSrv53892N_X_tB_ShJA");
+       // private static readonly TelegramBotClient Bot = new TelegramBotClient("546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI");
+    //    private static readonly TelegramBotClient Bot = new TelegramBotClient("514039168:AAHZEBIQS9d50PyxSrv53892N_X_tB_ShJA"); //TelegramCheck
+    //  private static readonly TelegramBotClient Bot = new TelegramBotClient("594291926:AAGG_UdMmhRIsec8mdT8e3TNRpHN7_fNbfc");
+      //private static readonly TelegramBotClient Bot = new TelegramBotClient("594291926:AAEQkWxK_szjmwKaDeL7nGCYZ8zDqr1zD38");
+      private static readonly TelegramBotClient Bot = new TelegramBotClient("616639924:AAFXRTmOSY_1tFyEiauA2KBHhl-S8yr7xUo");
+      //  private static readonly TelegramBotClient Bot = new TelegramBotClient("575255435:AAEO7i4fqTIszlU4Cnyg3U8VWpqboC_Zx0s");
+      //  private static readonly TelegramBotClient Bot = new TelegramBotClient("601147016:AAHsgXnB3GnC7u-BGhtBu7X-gEZs9ca67Y0");
+        
+        
         private static MySQLControl my_sql_control = new MySQLControl();
         private static ControlBot controlBot = new ControlBot();
         public static void Main(string[] args)
@@ -32,7 +39,9 @@ namespace Telegram.Bot.Examples.Echo
             var me = Bot.GetMeAsync().Result;
             Console.Title = "Telegram Бот "+ me.Username +" запущен!";
             Bot.StartReceiving();
+
             Console.WriteLine("Start listening for {0}", me.Username);
+           
             Console.ReadKey();
             controlBot.Run_Qurey_Console(my_sql_control, Bot);
         }
@@ -77,21 +86,12 @@ namespace Telegram.Bot.Examples.Echo
             StringBuilder str = new StringBuilder("");
             try
             {
-               
-                //foreach (var item in check.Document.Receipt.Items)
-                //{
-                //    double sum = Convert.ToDouble(item.Sum) / 100;
-                //    str.Append(string.Format("\n{0} x {2} - {1} руб", item.Name, sum, item.Quantity));
-                //}
                 control_telegraph.PrintCheck(check);
                 control_telegraph.CreatePage1("Чек №" + check.Document.Receipt.RequestNumber);
-                //control_telegraph.EditPage1("Чек №" + check.Document.Receipt.RequestNumber);
                 Thread.Sleep(700);
                 await Bot.SendTextMessageAsync(message.Chat.Id, "Ваш чек!");
-                  //await Bot.SendTextMessageAsync(message.Chat.Id, "http://telegra.ph//CHek-150-03-22");
                  
                 await Bot.SendTextMessageAsync(message.Chat.Id, control_telegraph.GetPageList1());
-               // await Bot.SendTextMessageAsync(message.Chat.Id, str.ToString());
                  await Bot.SendTextMessageAsync(message.Chat.Id, "Ожидайте результата сравнения цен!");
             }
             catch
@@ -105,7 +105,6 @@ namespace Telegram.Bot.Examples.Echo
             Thread.Sleep(10);
             my_sql_control.AddCheck((int)message.Chat.Id, check);
             Data_Analysis data_analysis = new Data_Analysis(my_sql_control);
-           // TelegraphAPI control_telegraph = new TelegraphAPI();
             List<CheckProduct> products = data_analysis.Search_Product(check);
             if (products == null) 
             {
@@ -138,8 +137,13 @@ namespace Telegram.Bot.Examples.Echo
                 image.Save(test.FilePath);
 
               //  string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot513572219:AAFnhp76wp-AMslfGNF7RVZcqmm3UU32kvs/{0}",file_name);
-                //string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI/{0}", file_name);
-                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot514039168:AAHZEBIQS9d50PyxSrv53892N_X_tB_ShJA/{0}", file_name);
+              //  string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot546895443:AAGpKxhnQCkQCpDRqOSF2_3A72X_hmo8OtI/{0}", file_name);
+            //  string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot514039168:AAHZEBIQS9d50PyxSrv53892N_X_tB_ShJA/{0}", file_name);
+            //    string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot594291926:AAHJC5OvjWsB11poZkbRVthZ8W_uBMnGRYI/{0}", file_name);
+               // string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot594291926:AAEQkWxK_szjmwKaDeL7nGCYZ8zDqr1zD38/{0}", file_name);
+                string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot616639924:AAFXRTmOSY_1tFyEiauA2KBHhl-S8yr7xUo/{0}", file_name);
+                //  string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot575255435:AAEO7i4fqTIszlU4Cnyg3U8VWpqboC_Zx0s/{0}", file_name); // CheckBot
+               // string get = String.Format("https://api.qrserver.com/v1/read-qr-code/?fileurl=https://api.telegram.org/file/bot601147016:AAHsgXnB3GnC7u-BGhtBu7X-gEZs9ca67Y0/{0}", file_name);
                 
                 string data = GET(get, "");
                 Console.WriteLine("Пользователь: {0} загрузил фото чека",message.Chat.Username);
@@ -156,7 +160,7 @@ namespace Telegram.Bot.Examples.Echo
         private static async void BotOnTextMessage(Message message)
         {
             if (message == null || message.Type != MessageType.TextMessage) return;
-           
+            //await Bot.SendTextMessageAsync("397600634", "Данного продукта нет в БД");
             switch (message.Text.Split(' ').First())
             {
                 case "/info":
@@ -260,7 +264,6 @@ namespace Telegram.Bot.Examples.Echo
         }
         private static async void AddKeyProduct(Message message)
         {
-            //string key_product = RegularExpressions(message.Text, "k:(\\d+)");
             string product = message.Text.Remove(0, message.Text.IndexOf(' ') + 1);
             await Bot.SendTextMessageAsync(message.Chat.Id, "Продукт: "+ product+ " записан!");
             my_sql_control.AddKeyProduct(product);
@@ -277,19 +280,7 @@ namespace Telegram.Bot.Examples.Echo
             var message_ev = ev.CallbackQuery.Message;
             if (ev.CallbackQuery.Data == "Регистрация")
             {
-                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "К сожалению пока нет технической возможности используйте приложение ФНС для регистраци!!!");
-                //await Bot.AnswerCallbackQueryAsync(ev.CallbackQuery.Id, "Зарегестрируйтесь в системе ФНС", false);
-                //var keyboard = new ReplyKeyboardMarkup
-                //{
-                //    Keyboard = new[] {
-                //                        new[] // row 1
-                //                               {
-                //                                   new KeyboardButton("Телефон") { RequestContact = true }
-                //                               },
-                //                            },
-                //    ResizeKeyboard = true
-                //};
-                //await Bot.SendTextMessageAsync(message_ev.Chat.Id, "Введите номер телефона", ParseMode.Default, false, false, 0, keyboard);
+                await Bot.SendTextMessageAsync(message_ev.Chat.Id, "К сожалению пока нет технической возможности используйте приложение ФНС для регистраци!!!"); 
             }
             if (ev.CallbackQuery.Data == "Авторизация")
             {
