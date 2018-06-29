@@ -62,7 +62,7 @@ namespace Telegram.Bot.Examples.Echo
             my_sql_control.AccountFNS((int)message.Chat.Id);
 
             Checking checking = new Checking(my_sql_control.FNS_Login, my_sql_control.FNS_Password);
-           // Checking checking = new Checking("+79817889931", "405381");
+
             CheckInfo checkInfo = new CheckInfo
             {
                 FN = RegularExpressions(input, "fn=(\\d+)"),
